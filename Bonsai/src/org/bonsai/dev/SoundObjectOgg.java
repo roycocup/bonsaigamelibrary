@@ -14,6 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with the Bonsai Game Library.  If not, see <http://www.gnu.org/licenses/>.
  *  
+ *  
+ *  In order to be able to use OggVorbis files you need to include JOrbis in 
+ *  your project <http://www.jcraft.com/jorbis/>.
  */
 
 package org.bonsai.dev;
