@@ -1,7 +1,7 @@
 /**
  *	Version 1.00
  *	Copyright (C) 2009 Ivo Wetzel
- *	<http://www.spielecast.de/>
+ *	<http://code.google.com/p/bonsaigamelibrary/>
  *
  *
  *  This file is part of the Bonsai Game Library.
@@ -62,7 +62,7 @@ public class Game extends Applet {
 			.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 			.getDefaultConfiguration();
 
-	private Canvas canvas;
+	protected Canvas canvas;
 	private BufferStrategy strategy;
 	protected BufferedImage background;
 	private Graphics2D graphics;
@@ -88,6 +88,7 @@ public class Game extends Applet {
 	// GUI
 	protected JFrame frame = null;
 	private Applet applet = null;
+	private boolean hasMenu = false;
 
 	// Classes
 	protected GameAnimation animation = new GameAnimation(this);
@@ -155,8 +156,7 @@ public class Game extends Applet {
 	/*
 	 * GUI ---------------------------------------------------------------------
 	 */
-	public void init(String title, int sizex, int sizey, boolean scaled,
-			boolean m) {
+	public void Frame(String title, int sizex, int sizey, boolean scaled, boolean menu) {
 		scale = scaled ? 2 : 1;
 		width = sizex;
 		height = sizey;
@@ -166,16 +166,14 @@ public class Game extends Applet {
 		frame.setLayout(new BorderLayout(0, 0));
 		frame.setResizable(false);
 		frame.setTitle(title);
-		frame.setVisible(true);
 		frame.addWindowListener(new FrameClose());
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.setVisible(true);
 		resize();
-
-		// Init
+		
+		// Engine
 		initEngine(frame);
-		menu = new GameMenu(this, m);
-		frame.validate();
-		resize();
+		hasMenu = menu;
 		initThreads();
 		canvas.requestFocus();
 	}
@@ -184,11 +182,11 @@ public class Game extends Applet {
 		frame.setSize((width * scale) + frame.getInsets().left
 				+ frame.getInsets().right, (height * scale)
 				+ frame.getInsets().top + frame.getInsets().bottom
-				+ (menu != null ? menu.menuBar.getSize().height : 0));
+				+ (menu != null ? menu.menuBar.getSize().height : 23));
 	}
 
 	public static void main(String args[]) {
-		new Game().init("Bonsai Game Library v0.99", 320, 240, false, true);
+		new Game().Frame("Bonsai Game Library v1.00", 320, 240, false, true);
 	}
 
 	public void onMenu(String menu) {
@@ -204,7 +202,7 @@ public class Game extends Applet {
 	/*
 	 * Applet
 	 * ---------------------------------------------------------------------
-	 */
+	 */	
 	@Override
 	public void start() {
 		if (strategy == null) {
@@ -214,7 +212,6 @@ public class Game extends Applet {
 			height = getHeight() / scale;
 			setLayout(null);
 			initEngine(this);
-			menu = new GameMenu(this, false);
 			applet = this;
 			initThreads();
 			canvas.requestFocus();
@@ -254,29 +251,40 @@ public class Game extends Applet {
 		canvas.setIgnoreRepaint(true);
 
 		// Create the buffer strategy
-		background = image.create(width, height, GameImage.Type.OPAQUE);
+		background = image.create(width, height, false);
 		canvas.createBufferStrategy(2);
 		do {
 			strategy = canvas.getBufferStrategy();
 		} while (strategy == null);
+
 	}
 
 	private void initThreads() {
 		new GameLoop().start();
-		gameLoader = new GameLoader();
+		gameLoader = new GameLoader(this);
 		gameLoader.start();
 	}
 
 	private class GameLoader extends Thread {
-		public GameLoader() {
+		private Game game;
+		public GameLoader(Game g) {
+			game = g;
 			setDaemon(true);
 			setName("Bonsai-GameLoader");
 		}
 
 		@Override
 		public void run() {
+			menu = new GameMenu(game, hasMenu);
+			if (!isApplet()) {
+				game.frame.validate();
+				game.resize();
+			}
+			
+			// Init Loading
 			initGame();
 			gameSound = sound.init(); // This actually takes time!
+			game.canvas.requestFocus();
 			gameLoaded = true;
 			finishLoading();
 

@@ -21,13 +21,12 @@ package org.bonsai.dev;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class GameAnimation {
-	private Game game;
+public class GameAnimation extends GameComponent {
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
 	protected LinkedList<Animation> animationList = new LinkedList<Animation>();
 
 	public GameAnimation(Game g) {
-		game = g;
+		super(g);
 	}
 
 	public Animation add(String id, int frames[], int frameTime, boolean loop) {
@@ -76,10 +75,10 @@ public class GameAnimation {
 
 		public void update() {
 			if (lastTime == -1) {
-				lastTime = game.getTime();
+				lastTime = getTime();
 
-			} else if (game.getTime() > lastTime + frameTime) {
-				long delta = game.getTime() - lastTime;
+			} else if (getTime() > lastTime + frameTime) {
+				long delta = getTime() - lastTime;
 				int frameCount = (int) (delta / frameTime);
 				pos += frameCount;
 				if (!loop) {
@@ -89,7 +88,7 @@ public class GameAnimation {
 				} else {
 					pos = pos % frames.length;
 				}
-				lastTime = game.getTime();
+				lastTime = getTime();
 			}
 		}
 

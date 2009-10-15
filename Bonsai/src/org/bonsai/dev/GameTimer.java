@@ -20,12 +20,11 @@ package org.bonsai.dev;
 
 import java.util.HashMap;
 
-public class GameTimer {
-	private Game game;
+public class GameTimer extends GameComponent {
 	private HashMap<String, Timer> timers = new HashMap<String, Timer>();
 
 	public GameTimer(Game g) {
-		game = g;
+		super(g);
 	}
 
 	public Timer add(String id, long timeout) {

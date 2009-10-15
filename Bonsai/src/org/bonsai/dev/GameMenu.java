@@ -11,8 +11,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
-public class GameMenu implements ActionListener {
-	private Game game = null;
+public class GameMenu extends GameComponent implements ActionListener {
 	private boolean active = false;
 	protected JMenuBar menuBar = null;
 	private HashMap<String, JMenu> menus = new HashMap<String, JMenu>();
@@ -20,6 +19,7 @@ public class GameMenu implements ActionListener {
 	private HashMap<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
 
 	public GameMenu(Game g, boolean active) {
+		super(g);
 		if (active) {
 			this.active = true;
 			game = g;
@@ -31,8 +31,7 @@ public class GameMenu implements ActionListener {
 		}
 	}
 
-	public void addRadioItem(String id, String name, String cmd,
-			String group) {
+	public void addRadioItem(String id, String name, String cmd, String group) {
 		if (active) {
 			ButtonGroup g = null;
 			if (menuGroups.containsKey(group)) {
@@ -72,7 +71,7 @@ public class GameMenu implements ActionListener {
 			get(id).setEnabled(enable);
 		}
 	}
-	
+
 	public void enable(boolean enable) {
 		if (active) {
 			for (JMenu menu : menus.values()) {
@@ -109,7 +108,7 @@ public class GameMenu implements ActionListener {
 			return menuItems.get(name);
 		}
 	}
-	
+
 	public void select(String name, boolean selected) {
 		if (active) {
 			getItem(name).setSelected(selected);

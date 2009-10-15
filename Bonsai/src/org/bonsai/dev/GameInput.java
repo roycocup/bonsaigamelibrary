@@ -27,12 +27,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.LinkedList;
 
-public class GameInput implements MouseListener, MouseMotionListener,
-		KeyListener, FocusListener {
+public class GameInput extends GameComponent implements MouseListener,
+		MouseMotionListener, KeyListener, FocusListener {
 
-	private Game game;
 	public GameInput(Game g) {
-		game = g;
+		super(g);
 	}
 
 	// Mouse
@@ -165,5 +164,4 @@ public class GameInput implements MouseListener, MouseMotionListener,
 	public boolean keyPressed(int key) {
 		return keysPressed.contains(key);
 	}
-
 }

@@ -18,37 +18,18 @@
 
 package org.bonsai.dev;
 
-import java.awt.AlphaComposite;
-import java.awt.Canvas;
 import java.awt.Graphics2D;
-import java.awt.MediaTracker;
-import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+
+import java.io.IOException;
 import java.net.URL;
 
-public class GameImage {
-	private Game game;
-	private MediaTracker tracker;
+import javax.imageio.ImageIO;
 
-	public static enum Type {
-		OPAQUE, BITMASK, TRANSLUCENT
-	}
-
+public class GameImage extends GameComponent {
 	public GameImage(Game g) {
-		game = g;
-		Canvas canvas = new Canvas(game.config);
-		tracker = new MediaTracker(canvas);
-	}
-
-	private static int getAlpha(Type type) {
-		if (type == Type.OPAQUE) {
-			return Transparency.OPAQUE;
-		} else if (type == Type.TRANSLUCENT) {
-			return Transparency.TRANSLUCENT;
-		} else {
-			return Transparency.BITMASK;
-		}
+		super(g);
 	}
 
 	public BufferedImage getScreen() {
@@ -72,51 +53,30 @@ public class GameImage {
 	}
 
 	public BufferedImage create(int width, int height) {
-		return create(width, height, Type.TRANSLUCENT);
+		return create(width, height, true);
 	}
 
-	public BufferedImage create(int width, int height, Type type) {
+	public BufferedImage create(int width, int height, boolean alpha) {
 		BufferedImage buffer = game.config.createCompatibleImage(width, height,
-				getAlpha(type));
+				alpha ? Transparency.TRANSLUCENT : Transparency.OPAQUE);
 		return buffer;
 	}
 
 	public BufferedImage get(String file) {
-		return get(file, Type.TRANSLUCENT);
-	}
-
-	public BufferedImage get(String file, Type type) {
 		URL filename = getURL(file);
 		if (filename == null) {
 			return null;
+		} else {
+			try {
+				return ImageIO.read(filename);
+			} catch (IOException e) {
+			}
+			return null;
 		}
-		java.awt.Image image = Toolkit.getDefaultToolkit().getImage(filename);
-		tracker.addImage(image, 0);
-		try {
-			tracker.waitForAll();
-
-		} catch (InterruptedException e) {
-			tracker.removeImage(image, 0);
-		} catch (NullPointerException e) {
-
-		}
-		BufferedImage buffer = game.config.createCompatibleImage(image
-				.getWidth(null), image.getHeight(null), getAlpha(type));
-
-		Graphics2D g = buffer.createGraphics();
-		g.setComposite(AlphaComposite.Src);
-		g.drawImage(image, 0, 0, null);
-		g.dispose();
-		return buffer;
-
 	}
 
 	public BufferedImage[] gets(String filename, int cols, int rows) {
-		return gets(filename, cols, rows, Type.TRANSLUCENT);
-	}
-
-	public BufferedImage[] gets(String filename, int cols, int rows, Type type) {
-		BufferedImage image = get(filename, type);
+		BufferedImage image = get(filename);
 		if (image == null) {
 			return null;
 		}

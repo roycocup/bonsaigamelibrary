@@ -27,14 +27,13 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
-public class GameSound {
-	private Game game;
+public class GameSound extends GameComponent {
 	private HashMap<String, String> soundTypes = new HashMap<String, String>();
 	private HashMap<String, byte[]> sounds = new HashMap<String, byte[]>();
 	private HashMap<String, SoundObject> soundsStatus = new HashMap<String, SoundObject>();
 
 	public GameSound(Game g) {
-		game = g;
+		super(g);
 	}
 
 	public boolean load(String id, String filename) {

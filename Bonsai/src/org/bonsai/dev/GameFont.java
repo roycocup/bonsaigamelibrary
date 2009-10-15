@@ -21,19 +21,17 @@ package org.bonsai.dev;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class GameFont {
-	private Game game;
+public class GameFont extends GameComponent {
 	private BufferedImage[] fontImages;
 	private String fontChars;
 	private int fontWidth;
 	private int fontHeight;
 
 	public GameFont(Game g) {
-		game = g;
+		super(g);
 	}
 
 	public boolean load(String filename, int cols, int rows, String chars) {
-
 		fontImages = game.image.gets(filename, cols, rows);
 		if (fontImages == null) {
 			return false;
