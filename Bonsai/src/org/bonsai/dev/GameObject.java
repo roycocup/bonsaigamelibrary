@@ -24,6 +24,7 @@ public class GameObject<G extends Game> {
 	protected GameFont font;
 	protected GameInput input;
 	protected GameImage image;
+	protected GameMenu menu;
 	protected GameSound sound;
 	protected GameTimer timer;
 	
@@ -33,6 +34,7 @@ public class GameObject<G extends Game> {
 		font = game.font;
 		input = game.input;
 		image = game.image;
+		menu = game.menu;
 		sound = game.sound;
 		timer = game.timer;
 	}

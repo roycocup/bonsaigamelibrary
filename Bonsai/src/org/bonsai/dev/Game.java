@@ -31,8 +31,6 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
@@ -47,22 +45,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.WindowConstants;
 
 import org.bonsai.ext.Base64;
 
 import netscape.javascript.JSObject;
 
-public class Game extends Applet implements ActionListener {
+public class Game extends Applet {
 	// Applet
 	private static final long serialVersionUID = -7860545086276629929L;
 
@@ -92,15 +83,11 @@ public class Game extends Applet implements ActionListener {
 	private long fpsWait = (long) (1.0 / maxFPS * 1000);
 	private long gameTime = 0;
 
-	// Menus & Input
-	private JFrame frame = null;
-	private Applet applet = null;
-	private JMenuBar menuBar = null;
-	private HashMap<String, JMenu> menus = new HashMap<String, JMenu>();
-	private HashMap<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
-	private HashMap<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
-
 	private Thread gameLoader = null;
+
+	// GUI
+	protected JFrame frame = null;
+	private Applet applet = null;
 
 	// Classes
 	protected GameAnimation animation = new GameAnimation(this);
@@ -109,14 +96,11 @@ public class Game extends Applet implements ActionListener {
 	protected GameInput input = new GameInput(this);
 	protected GameFont font = new GameFont(this);
 	protected GameTimer timer = new GameTimer(this);
+	protected GameMenu menu = null;
 
 	// Getters
 	public JFrame getFrame() {
 		return frame;
-	}
-
-	public JMenuBar getMenuBar() {
-		return menuBar;
 	}
 
 	public Applet getApplet() {
@@ -125,6 +109,10 @@ public class Game extends Applet implements ActionListener {
 
 	public boolean isApplet() {
 		return applet != null;
+	}
+
+	public boolean hasMenu() {
+		return menu != null;
 	}
 
 	public boolean isJar() {
@@ -168,7 +156,7 @@ public class Game extends Applet implements ActionListener {
 	 * GUI ---------------------------------------------------------------------
 	 */
 	public void init(String title, int sizex, int sizey, boolean scaled,
-			boolean menu) {
+			boolean m) {
 		scale = scaled ? 2 : 1;
 		width = sizex;
 		height = sizey;
@@ -185,9 +173,7 @@ public class Game extends Applet implements ActionListener {
 
 		// Init
 		initEngine(frame);
-		if (menu) {
-			initMenus();
-		}
+		menu = new GameMenu(this, m);
 		frame.validate();
 		resize();
 		initThreads();
@@ -198,100 +184,11 @@ public class Game extends Applet implements ActionListener {
 		frame.setSize((width * scale) + frame.getInsets().left
 				+ frame.getInsets().right, (height * scale)
 				+ frame.getInsets().top + frame.getInsets().bottom
-				+ (menuBar != null ? menuBar.getSize().height : 0));
+				+ (menu != null ? menu.menuBar.getSize().height : 0));
 	}
 
 	public static void main(String args[]) {
 		new Game().init("Bonsai Game Library v0.99", 320, 240, false, true);
-	}
-
-	/*
-	 * Menus -------------------------------------------------------------------
-	 */
-	public void initMenus() {
-		menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
-		addMenu("Game");
-		addMenuCheckItem("Game", "Pause", "pause");
-		addMenuItem("Game", "Exit", "exit");
-	}
-
-	public void addMenuRadioItem(String id, String name, String cmd,
-			String group) {
-		ButtonGroup g = null;
-		if (menuGroups.containsKey(group)) {
-			g = menuGroups.get(group);
-		} else {
-			g = new ButtonGroup();
-			menuGroups.put(group, g);
-		}
-		JRadioButtonMenuItem item = new JRadioButtonMenuItem(name);
-		g.add(item);
-		addMenuItems(id, item, cmd);
-	}
-
-	public void addMenuCheckItem(String id, String name, String cmd) {
-		addMenuItems(id, new JCheckBoxMenuItem(name), cmd);
-	}
-
-	public void addMenuItem(String id, String name, String cmd) {
-		addMenuItems(id, new JMenuItem(name), cmd);
-	}
-
-	private void addMenuItems(String id, JMenuItem item, String cmd) {
-		JMenu menu = getMenu(id);
-		if (menu != null && !menuItems.containsKey(cmd)) {
-			item.setActionCommand(cmd);
-			item.addActionListener(this);
-			menu.add(item);
-			menuItems.put(cmd, item);
-		}
-	}
-
-	public void enableMenu(boolean enable) {
-		for (JMenu menu : menus.values()) {
-			menu.setEnabled(enable);
-		}
-	}
-
-	public JMenu addMenu(String name) {
-		if (!menus.containsKey(name)) {
-			JMenu menu = new JMenu(name);
-			menus.put(name, menu);
-			menuBar.add(menu);
-			menuBar.validate();
-			menu.setEnabled(false);
-			return menu;
-		} else {
-			return null;
-		}
-	}
-
-	public JMenu getMenu(String name) {
-		if (!menus.containsKey(name)) {
-			return null;
-		} else {
-			return menus.get(name);
-		}
-	}
-
-	public JMenuItem getMenuItem(String name) {
-		if (!menuItems.containsKey(name)) {
-			return null;
-		} else {
-			return menuItems.get(name);
-		}
-	}
-
-	public void actionPerformed(ActionEvent e) {
-		String cmd = e.getActionCommand();
-		if (cmd.equals("exit")) {
-			exitGame();
-		} else if (cmd.equals("pause")) {
-			pause(!paused);
-		} else {
-			onMenu(cmd);
-		}
 	}
 
 	public void onMenu(String menu) {
@@ -317,6 +214,7 @@ public class Game extends Applet implements ActionListener {
 			height = getHeight() / scale;
 			setLayout(null);
 			initEngine(this);
+			menu = new GameMenu(this, false);
 			applet = this;
 			initThreads();
 			canvas.requestFocus();
@@ -405,7 +303,7 @@ public class Game extends Applet implements ActionListener {
 	}
 
 	public void finishLoading() {
-		enableMenu(true);
+		menu.enable(true);
 	}
 
 	/*
@@ -572,7 +470,7 @@ public class Game extends Applet implements ActionListener {
 
 	public void pause(boolean mode) {
 		paused = mode;
-		getMenuItem("pause").setSelected(paused);
+		menu.getItem("pause").setSelected(paused);
 		sound.pauseAll(paused);
 	}
 
@@ -597,7 +495,7 @@ public class Game extends Applet implements ActionListener {
 				OutputStream stream = new FileOutputStream(new File(filename));
 				writeSave(stream);
 				stream.close();
-				
+
 			} else {
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				writeSave(stream);
