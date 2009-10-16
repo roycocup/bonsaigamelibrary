@@ -6,8 +6,8 @@
  *
  *  This file is part of the Bonsai Game Library.
  *
- *  The Bonsai Game Library is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
+ *  The Bonsai Game Library is free software: you can redistribute it and/or 
+ *  modify it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
@@ -16,8 +16,8 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  * 
- *  You should have received a copy of the GNU General Public License
- *  along with the Bonsai Game Library.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License along with
+ *  the Bonsai Game Library. If not, see <http://www.gnu.org/licenses/>.
  *  
  */
 
@@ -53,42 +53,41 @@ import org.bonsai.ext.Base64;
 
 import netscape.javascript.JSObject;
 
-public class Game extends Applet {
+public abstract class Game extends Applet {
 	// Applet
 	private static final long serialVersionUID = -7860545086276629929L;
 
 	// Graphics
-	protected GraphicsConfiguration config = GraphicsEnvironment
+	private GraphicsConfiguration config = GraphicsEnvironment
 			.getLocalGraphicsEnvironment().getDefaultScreenDevice()
 			.getDefaultConfiguration();
 
-	protected Canvas canvas;
+	private Canvas canvas;
 	private BufferStrategy strategy;
-	protected BufferedImage background;
+	private BufferedImage background;
 	private Graphics2D graphics;
 	private int width;
 	private int height;
-	protected int scale = 1;
+	private int scale = 1;
 
 	// Game Stuff
 	private boolean gameLoaded = false;
-	protected boolean gameSound = false;
+	private boolean gameSound = false;
 	private boolean isRunning = true;
-	protected boolean paused = false;
-	protected boolean focused = false;
-	protected boolean pausedOnFocus = false;
+	private boolean paused = false;
+	private boolean focused = false;
+	private boolean pausedOnFocus = false;
 
-	private int maxFPS = 30;
+	private int maxFPS = 0;
 	private int currentFPS = 0;
-	private long fpsWait = (long) (1.0 / maxFPS * 1000);
+	private long fpsWait = 0;
 	private long gameTime = 0;
 
-	private Thread gameLoader = null;
+	private transient Thread gameLoader = null;
 
 	// GUI
-	protected JFrame frame = null;
+	private JFrame frame = null;
 	private Applet applet = null;
-	private boolean hasMenu = false;
 
 	// Classes
 	protected GameAnimation animation = new GameAnimation(this);
@@ -100,23 +99,32 @@ public class Game extends Applet {
 	protected GameMenu menu = null;
 
 	// Getters
-	public JFrame getFrame() {
+	public final JFrame getFrame() {
 		return frame;
 	}
 
-	public Applet getApplet() {
+	public final Applet getApplet() {
 		return applet;
 	}
 
-	public boolean isApplet() {
-		return applet != null;
+	public final GraphicsConfiguration getConfig() {
+		return config;
 	}
 
-	public boolean hasMenu() {
+	public final BufferedImage getBackbuffer() {
+		return background;
+	}
+
+	public final boolean hasMenu() {
 		return menu != null;
 	}
 
-	public boolean isJar() {
+	// Checks
+	public final boolean isApplet() {
+		return applet != null;
+	}
+
+	public final boolean isJar() {
 		if (!isApplet()) {
 			try {
 				return this.getClass().getProtectionDomain().getCodeSource()
@@ -130,7 +138,7 @@ public class Game extends Applet {
 		}
 	}
 
-	public String getPath() {
+	public final String getPath() {
 		if (!isApplet()) {
 			try {
 
@@ -149,15 +157,20 @@ public class Game extends Applet {
 		}
 	}
 
-	public String getBasePath() {
-		return getPath();
-	}
+	public abstract String getBasePath();
 
 	/*
 	 * GUI ---------------------------------------------------------------------
 	 */
-	public void Frame(String title, int sizex, int sizey, boolean scaled, boolean menu) {
-		scale = scaled ? 2 : 1;
+	public final void frame(final String title, final int sizex,
+			final int sizey, final boolean scaled, final boolean m) {
+
+		// Size
+		if (scaled) {
+			scale = 2;
+		} else {
+			scale = 1;
+		}
 		width = sizex;
 		height = sizey;
 
@@ -166,14 +179,14 @@ public class Game extends Applet {
 		frame.setLayout(new BorderLayout(0, 0));
 		frame.setResizable(false);
 		frame.setTitle(title);
+		this.menu = new GameMenu(this, m);
 		frame.addWindowListener(new FrameClose());
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setVisible(true);
-		resize();
-		
+
 		// Engine
 		initEngine(frame);
-		hasMenu = menu;
+		resize();
 		initThreads();
 		canvas.requestFocus();
 	}
@@ -182,19 +195,15 @@ public class Game extends Applet {
 		frame.setSize((width * scale) + frame.getInsets().left
 				+ frame.getInsets().right, (height * scale)
 				+ frame.getInsets().top + frame.getInsets().bottom
-				+ (menu != null ? menu.menuBar.getSize().height : 23));
+				+ menu.getSize());
 	}
 
-	public static void main(String args[]) {
-		new Game().Frame("Bonsai Game Library v1.00", 320, 240, false, true);
-	}
-
-	public void onMenu(String menu) {
+	public void onMenu(final String id) {
 	}
 
 	private class FrameClose extends WindowAdapter {
 		@Override
-		public void windowClosing(WindowEvent e) {
+		public void windowClosing(final WindowEvent e) {
 			isRunning = false;
 		}
 	}
@@ -202,15 +211,20 @@ public class Game extends Applet {
 	/*
 	 * Applet
 	 * ---------------------------------------------------------------------
-	 */	
+	 */
 	@Override
-	public void start() {
+	public final void start() {
 		if (strategy == null) {
 			isRunning = true;
-			scale = getParameter("scaled") != null ? 2 : 1;
+			if (getParameter("scaled") != null) {
+				scale = 2;
+			} else {
+				scale = 1;
+			}
 			width = getWidth() / scale;
 			height = getHeight() / scale;
 			setLayout(null);
+			this.menu = new GameMenu(this, false);
 			initEngine(this);
 			applet = this;
 			initThreads();
@@ -218,26 +232,29 @@ public class Game extends Applet {
 		}
 	}
 
-	public void destroy() {
+	@Override
+	public final void destroy() {
 		exitGame();
 	}
 
-	public int height() {
+	public final int height() {
 		return height;
 	}
 
-	public int width() {
+	public final int width() {
 		return width;
 	}
 
-	public int scale() {
+	public final int scale() {
 		return scale;
 	}
 
 	/*
 	 * Gameloader --------------------------------------------------------------
 	 */
-	private void initEngine(Container parent) {
+	private void initEngine(final Container parent) {
+		setFPS(30);
+
 		// Canvas
 		canvas = new Canvas(config);
 		canvas.setSize(width * scale, height * scale);
@@ -261,30 +278,21 @@ public class Game extends Applet {
 
 	private void initThreads() {
 		new GameLoop().start();
-		gameLoader = new GameLoader(this);
+		gameLoader = new GameLoader();
 		gameLoader.start();
 	}
 
 	private class GameLoader extends Thread {
-		private Game game;
-		public GameLoader(Game g) {
-			game = g;
+		public GameLoader() {
 			setDaemon(true);
 			setName("Bonsai-GameLoader");
 		}
 
 		@Override
 		public void run() {
-			menu = new GameMenu(game, hasMenu);
-			if (!isApplet()) {
-				game.frame.validate();
-				game.resize();
-			}
-			
 			// Init Loading
 			initGame();
 			gameSound = sound.init(); // This actually takes time!
-			game.canvas.requestFocus();
 			gameLoaded = true;
 			finishLoading();
 
@@ -301,22 +309,18 @@ public class Game extends Applet {
 		}
 	}
 
-	public void initGame() {
-	}
+	public abstract void initGame();
 
-	public void initLoading() {
-	}
+	public abstract void initLoading();
 
-	public void renderLoading(Graphics2D g) {
-	}
+	public abstract void renderLoading(final Graphics2D g);
 
-	public void finishLoading() {
-		menu.enable(true);
-	}
+	public abstract void finishLoading();
 
 	/*
 	 * Gameloop ----------------------------------------------------------------
 	 */
+
 	private class GameLoop extends Thread {
 		@Override
 		public void run() {
@@ -336,9 +340,7 @@ public class Game extends Applet {
 				// Update Game
 				if (!paused && gameLoaded) {
 					updateGame();
-					for (GameAnimation.Animation anim : animation.animationList) {
-						anim.update();
-					}
+					animation.update();
 				}
 				input.clearKeys();
 				input.clearMouse();
@@ -360,43 +362,51 @@ public class Game extends Applet {
 					} else {
 						bg.drawImage(background, 0, 0, null);
 					}
-				} while (updateScreen() == false);
+				} while (!updateScreen());
 
 				// Limit FPS
-				try {
-					if (!paused) {
-						// Use Nanoseconds instead of currentTimeMillis which
-						// has a much lower resolution(based on the OS interrupt
-						// rate) and would result in too high FPS.
 
-						// Note: There is a way to set the interrupt rate lower
-						// which is done by many programs, mostly media players.
-						// That means if you use currentTimeMillis and play a
-						// track, your FPS is okay, but without the music it's
-						// too high.
+				if (!paused) {
+					// Use Nanoseconds instead of currentTimeMillis which
+					// has a much lower resolution(based on the OS interrupt
+					// rate) and would result in too high FPS.
 
-						// More on this:
-						// <http://blogs.sun.com/dholmes/entry/inside_the_hotspot_vm_clocks>
-						long renderTime = (System.nanoTime() - renderStart) / 1000000;
+					// Note: There is a way to set the interrupt rate lower
+					// which is done by many programs, mostly media players.
+					// That means if you use currentTimeMillis and play a
+					// track, your FPS is okay, but without the music it's
+					// too high.
+
+					// More on this:
+					// <http://blogs.sun.com/dholmes/entry/inside_the_hotspot_vm_clocks>
+					long renderTime = (System.nanoTime() - renderStart) / 1000000;
+					try {
 						Thread.sleep(Math.max(0, fpsWait - renderTime));
-						renderTime = (System.nanoTime() - renderStart) / 1000000;
-						if (gameLoaded) {
-							gameTime += renderTime;
-						}
-						fpsTime += renderTime;
-						fpsCount += 1;
-						if (fpsTime > 1000 - fpsWait) {
-							currentFPS = fpsCount;
-							fpsCount = 0;
-							fpsTime = 0;
-						}
-					} else {
-						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						Thread.interrupted();
+						break;
 					}
-				} catch (InterruptedException e) {
-					Thread.interrupted();
-					break;
+					renderTime = (System.nanoTime() - renderStart) / 1000000;
+					if (gameLoaded) {
+						gameTime += renderTime;
+					}
+					fpsTime += renderTime;
+					fpsCount += 1;
+					if (fpsTime > 1000 - fpsWait) {
+						currentFPS = fpsCount;
+						fpsCount = 0;
+						fpsTime = 0;
+					}
+
+				} else {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						Thread.interrupted();
+						break;
+					}
 				}
+
 			}
 
 			// Clean up
@@ -441,63 +451,68 @@ public class Game extends Applet {
 	/*
 	 * Game methods ------------------------------------------------------------
 	 */
-	public void renderGame(Graphics2D g) {
-	}
+	public abstract void renderGame(final Graphics2D g);
 
-	public void updateGame() {
-	}
+	public abstract void updateGame();
 
-	public void finishGame() {
-	}
+	public abstract void finishGame();
 
-	public void exitGame() {
+	public final void exitGame() {
 		isRunning = false;
 	}
 
 	// Setters & Getters
-	public boolean isRunning() {
+	public final boolean isRunning() {
 		return isRunning;
 	}
 
-	public boolean hasSound() {
+	public final boolean hasSound() {
 		return gameSound;
 	}
 
-	public long getTime() {
+	public final long getTime() {
 		return gameTime;
 	}
 
-	public void setFPS(int fps) {
+	public final void setFPS(final int fps) {
 		maxFPS = fps;
 		fpsWait = (long) (1.0 / maxFPS * 1000);
 	}
 
-	public int getFPS() {
+	public final int getFPS() {
 		return currentFPS;
 	}
 
-	public void pause(boolean mode) {
+	public final void pause(final boolean mode) {
 		paused = mode;
 		menu.getItem("pause").setSelected(paused);
 		sound.pauseAll(paused);
 	}
 
-	public boolean isPaused() {
+	public final boolean isPaused() {
 		return paused;
 	}
 
-	public void pauseOnFocus(boolean mode) {
+	public final void pauseOnFocus(final boolean mode) {
 		pausedOnFocus = mode;
 	}
 
-	public boolean isFocused() {
+	public final boolean isPausedOnFocus() {
+		return pausedOnFocus;
+	}
+
+	public final boolean isFocused() {
 		return focused;
+	}
+
+	public final void setFocused(final boolean focus) {
+		focused = focus;
 	}
 
 	/*
 	 * Saving ------------------------------------------------------------------
 	 */
-	public boolean saveGame(String filename, String cookiename) {
+	public final boolean saveGame(final String filename, final String cookiename) {
 		try {
 			if (!isApplet()) {
 				OutputStream stream = new FileOutputStream(new File(filename));
@@ -523,14 +538,14 @@ public class Game extends Applet {
 		return true;
 	}
 
-	public void writeSave(OutputStream stream) throws IOException {
+	public void writeSave(final OutputStream stream) throws IOException {
 	}
 
 	/*
 	 * Loading -----------------------------------------------------------------
 	 */
 
-	public boolean loadGame(String filename, String cookiename) {
+	public final boolean loadGame(final String filename, final String cookiename) {
 		try {
 			InputStream stream = null;
 			if (!isApplet()) {
@@ -538,7 +553,7 @@ public class Game extends Applet {
 
 			} else {
 				String data = null;
-				JSObject myBrowser = (JSObject) JSObject.getWindow(this);
+				JSObject myBrowser = JSObject.getWindow(this);
 				JSObject myDocument = (JSObject) myBrowser
 						.getMember("document");
 
@@ -549,8 +564,9 @@ public class Game extends Applet {
 					if (offset != -1) {
 						offset += get.length();
 						int end = myCookie.indexOf(";", offset);
-						if (end == -1)
+						if (end == -1) {
 							end = myCookie.length();
+						}
 						data = myCookie.substring(offset, end);
 					}
 				}
@@ -583,6 +599,6 @@ public class Game extends Applet {
 		return true;
 	}
 
-	public void readSave(InputStream stream) throws IOException {
+	public void readSave(final InputStream stream) throws IOException {
 	}
 }

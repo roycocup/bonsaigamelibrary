@@ -27,11 +27,12 @@ public class GameFont extends GameComponent {
 	private int fontWidth;
 	private int fontHeight;
 
-	public GameFont(Game g) {
+	public GameFont(final Game g) {
 		super(g);
 	}
 
-	public boolean load(String filename, int cols, int rows, String chars) {
+	public final boolean load(final String filename, final int cols,
+			final int rows, final String chars) {
 		fontImages = game.image.gets(filename, cols, rows);
 		if (fontImages == null) {
 			return false;
@@ -42,7 +43,8 @@ public class GameFont extends GameComponent {
 		return true;
 	}
 
-	public void draw(Graphics2D g, String text, int x, int y) {
+	public final void draw(final Graphics2D g, final String text, final int x,
+			final int y) {
 		int xp = x;
 		int yp = y;
 		for (int i = 0; i < text.length(); i++) {
@@ -62,7 +64,7 @@ public class GameFont extends GameComponent {
 		}
 	}
 
-	public int width(String text) {
+	public final int width(final String text) {
 		int size = 0;
 		int xp = 0;
 		for (int i = 0; i < text.length(); i++) {

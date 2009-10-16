@@ -23,19 +23,19 @@ import java.util.HashMap;
 public class GameTimer extends GameComponent {
 	private HashMap<String, Timer> timers = new HashMap<String, Timer>();
 
-	public GameTimer(Game g) {
+	public GameTimer(final Game g) {
 		super(g);
 	}
 
-	public Timer add(String id, long timeout) {
+	public final Timer add(final String id, final long timeout) {
 		return new Timer(id, timeout);
 	}
 
-	public boolean expired(String id) {
+	public final boolean expired(final String id) {
 		return expired(id, -1);
 	}
 
-	public boolean expired(String id, long time) {
+	public final boolean expired(final String id, final long time) {
 		if (timers.containsKey(id)) {
 			return timers.get(id).expired(time);
 		} else {
@@ -43,11 +43,11 @@ public class GameTimer extends GameComponent {
 		}
 	}
 
-	public boolean pending(String id) {
+	public final boolean pending(final String id) {
 		return pending(id, -1);
 	}
 
-	public boolean pending(String id, long time) {
+	public final boolean pending(final String id, final long time) {
 		if (timers.containsKey(id)) {
 			return timers.get(id).pending(time);
 		} else {
@@ -55,17 +55,17 @@ public class GameTimer extends GameComponent {
 		}
 	}
 
-	public void set(String id) {
+	public final void set(final String id) {
 		set(id, 0);
 	}
 
-	public void set(String id, long time) {
+	public final void set(final String id, final long time) {
 		if (timers.containsKey(id)) {
 			timers.get(id).set(time);
 		}
 	}
 
-	public boolean delete(String id) {
+	public final boolean delete(final String id) {
 		if (timers.containsKey(id)) {
 			timers.remove(id);
 			return true;
@@ -78,17 +78,17 @@ public class GameTimer extends GameComponent {
 		private long timeout = 0;
 		private long time = 0;
 
-		public Timer(String id, long timeout) {
+		public Timer(final String id, final long t) {
 			timers.put(id, this);
 			set(0);
-			this.timeout = timeout;
+			timeout = t;
 		}
 
-		public void set(long i) {
+		public final void set(final long i) {
 			time = game.getTime() + i;
 		}
 
-		public boolean expired(long i) {
+		public final boolean expired(final long i) {
 			if (i == -1) {
 				return game.getTime() > time + timeout;
 			} else {
@@ -96,7 +96,7 @@ public class GameTimer extends GameComponent {
 			}
 		}
 
-		public boolean pending(long i) {
+		public final boolean pending(final long i) {
 			if (i == -1) {
 				return game.getTime() < time + timeout;
 

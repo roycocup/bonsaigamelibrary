@@ -30,7 +30,7 @@ import java.util.LinkedList;
 public class GameInput extends GameComponent implements MouseListener,
 		MouseMotionListener, KeyListener, FocusListener {
 
-	public GameInput(Game g) {
+	public GameInput(final Game g) {
 		super(g);
 	}
 
@@ -40,10 +40,10 @@ public class GameInput extends GameComponent implements MouseListener,
 	private int mouseX = 0;
 	private int mouseY = 0;
 
-	public void mouseClicked(MouseEvent e) {
+	public void mouseClicked(final MouseEvent e) {
 	}
 
-	public void mousePressed(MouseEvent e) {
+	public final void mousePressed(final MouseEvent e) {
 		int button = e.getButton();
 		if (!mouseDown.contains(button)) {
 			mouseDown.add(button);
@@ -51,7 +51,7 @@ public class GameInput extends GameComponent implements MouseListener,
 		}
 	}
 
-	public void mouseReleased(MouseEvent e) {
+	public final void mouseReleased(final MouseEvent e) {
 		int button = e.getButton();
 		mouseDown.remove(Integer.valueOf(button));
 		if (mousePressed.contains(button)) {
@@ -59,25 +59,25 @@ public class GameInput extends GameComponent implements MouseListener,
 		}
 	}
 
-	public void mouseEntered(MouseEvent e) {
+	public void mouseEntered(final MouseEvent e) {
 	}
 
-	public void mouseExited(MouseEvent e) {
+	public final void mouseExited(final MouseEvent e) {
 		mouseDown.clear();
 		mousePressed.clear();
 	}
 
-	public void mouseDragged(MouseEvent e) {
+	public final void mouseDragged(final MouseEvent e) {
 		mouseX = e.getX();
 		mouseY = e.getY();
 	}
 
-	public void mouseMoved(MouseEvent e) {
+	public final void mouseMoved(final MouseEvent e) {
 		mouseX = e.getX();
 		mouseY = e.getY();
 	}
 
-	public void clearMouse() {
+	public final void clearMouse() {
 		mousePressed.clear();
 	}
 
@@ -86,10 +86,10 @@ public class GameInput extends GameComponent implements MouseListener,
 	private LinkedList<Integer> keysDown = new LinkedList<Integer>();
 	private LinkedList<Integer> keysRemove = new LinkedList<Integer>();
 
-	public void keyTyped(KeyEvent e) {
+	public void keyTyped(final KeyEvent e) {
 	}
 
-	public void keyPressed(KeyEvent e) {
+	public final void keyPressed(final KeyEvent e) {
 		int key = e.getKeyCode();
 		if (!keysDown.contains(key)) {
 			keysDown.add(key);
@@ -98,7 +98,7 @@ public class GameInput extends GameComponent implements MouseListener,
 		e.consume();
 	}
 
-	public void keyReleased(KeyEvent e) {
+	public final void keyReleased(final KeyEvent e) {
 		int key = e.getKeyCode();
 
 		// Fix bugged PRINTSCREEN key event, only fires on keyReleased
@@ -109,7 +109,7 @@ public class GameInput extends GameComponent implements MouseListener,
 		e.consume();
 	}
 
-	public void clearKeys() {
+	public final void clearKeys() {
 		for (int i = 0; i < keysRemove.size(); i++) {
 			int key = keysRemove.get(i);
 			keysDown.remove(Integer.valueOf(key));
@@ -122,17 +122,17 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	// Focus
-	public void focusGained(FocusEvent e) {
-		game.focused = true;
-		if (game.pausedOnFocus) {
-			game.paused = false;
+	public final void focusGained(final FocusEvent e) {
+		game.setFocused(true);
+		if (game.isPausedOnFocus()) {
+			game.pause(false);
 		}
 	}
 
-	public void focusLost(FocusEvent e) {
-		game.focused = false;
-		if (game.pausedOnFocus) {
-			game.paused = true;
+	public final void focusLost(final FocusEvent e) {
+		game.setFocused(false);
+		if (game.isPausedOnFocus()) {
+			game.pause(true);
 		}
 		keysDown.clear();
 		keysPressed.clear();
@@ -141,27 +141,27 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	// Getters
-	public int mouseX() {
-		return mouseX / game.scale;
+	public final int mouseX() {
+		return mouseX / game.scale();
 	}
 
-	public int mouseY() {
-		return mouseY / game.scale;
+	public final int mouseY() {
+		return mouseY / game.scale();
 	}
 
-	public boolean mouseDown(int button) {
+	public final boolean mouseDown(final int button) {
 		return mouseDown.contains(button);
 	}
 
-	public boolean mousePressed(int button) {
+	public final boolean mousePressed(final int button) {
 		return mousePressed.contains(button);
 	}
 
-	public boolean keyDown(int key) {
+	public final boolean keyDown(final int key) {
 		return keysDown.contains(key);
 	}
 
-	public boolean keyPressed(int key) {
+	public final boolean keyPressed(final int key) {
 		return keysPressed.contains(key);
 	}
 }

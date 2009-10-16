@@ -28,41 +28,43 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class GameImage extends GameComponent {
-	public GameImage(Game g) {
+	public GameImage(final Game g) {
 		super(g);
 	}
 
-	public BufferedImage getScreen() {
+	public final BufferedImage getScreen() {
 		int w = game.width();
 		int h = game.height();
 		int s = game.scale();
 		BufferedImage buffer = create(w * s, h * s);
 		Graphics2D g = (Graphics2D) buffer.getGraphics();
 		if (s != 1) {
-			g.drawImage(game.background, 0, 0, w * s, h * s, 0, 0, w, h, null);
+			g.drawImage(game.getBackbuffer(), 0, 0, w * s, h * s, 0, 0, w, h,
+					null);
 		} else {
-			g.drawImage(game.background, 0, 0, null);
+			g.drawImage(game.getBackbuffer(), 0, 0, null);
 		}
 		g.dispose();
 		return buffer;
 	}
 
-	private URL getURL(String filename) {
+	private URL getURL(final String filename) {
 		URL url = Game.class.getResource(filename);
 		return url;
 	}
 
-	public BufferedImage create(int width, int height) {
+	public final BufferedImage create(final int width, final int height) {
 		return create(width, height, true);
 	}
 
-	public BufferedImage create(int width, int height, boolean alpha) {
-		BufferedImage buffer = game.config.createCompatibleImage(width, height,
-				alpha ? Transparency.TRANSLUCENT : Transparency.OPAQUE);
+	public final BufferedImage create(final int width, final int height,
+			final boolean alpha) {
+		BufferedImage buffer = game.getConfig().createCompatibleImage(width,
+				height, alpha ? Transparency.TRANSLUCENT : Transparency.OPAQUE);
 		return buffer;
 	}
 
-	public BufferedImage get(String file) {
+	public final BufferedImage get(final String file) {
 		URL filename = getURL(file);
 		if (filename == null) {
 			return null;
@@ -70,12 +72,13 @@ public class GameImage extends GameComponent {
 			try {
 				return ImageIO.read(filename);
 			} catch (IOException e) {
+				return null;
 			}
-			return null;
 		}
 	}
 
-	public BufferedImage[] gets(String filename, int cols, int rows) {
+	public final BufferedImage[] gets(final String filename, final int cols,
+			final int rows) {
 		BufferedImage image = get(filename);
 		if (image == null) {
 			return null;
@@ -86,8 +89,8 @@ public class GameImage extends GameComponent {
 		int i = 0;
 		for (int y = 0; y < rows; y++) {
 			for (int x = 0; x < cols; x++) {
-				buffer[i] = game.config.createCompatibleImage(width, height,
-						image.getColorModel().getTransparency());
+				buffer[i] = game.getConfig().createCompatibleImage(width,
+						height, image.getColorModel().getTransparency());
 				Graphics2D g = buffer[i].createGraphics();
 				g.drawImage(image, 0, 0, width, height, x * width, y * height,
 						(x + 1) * width, (y + 1) * height, null);
@@ -98,10 +101,10 @@ public class GameImage extends GameComponent {
 		return buffer;
 	}
 
-	public BufferedImage flip(BufferedImage image, boolean h, boolean v) {
-		BufferedImage buffer = game.config.createCompatibleImage(image
-				.getWidth(), image.getHeight(), image.getColorModel()
-				.getTransparency());
+	public final BufferedImage flip(final BufferedImage image, final boolean h, final boolean v) {
+		BufferedImage buffer = game.getConfig().createCompatibleImage(
+				image.getWidth(), image.getHeight(),
+				image.getColorModel().getTransparency());
 
 		Graphics2D g = buffer.createGraphics();
 		g.drawImage(image, h ? image.getWidth() : 0, v ? image.getHeight() : 0,
@@ -112,7 +115,8 @@ public class GameImage extends GameComponent {
 		return buffer;
 	}
 
-	public BufferedImage[] flips(BufferedImage[] images, boolean h, boolean v) {
+	public final BufferedImage[] flips(final BufferedImage[] images, final boolean h,
+			final boolean v) {
 		BufferedImage[] buffer = new BufferedImage[images.length];
 		for (int i = 0; i < images.length; i++) {
 			buffer[i] = flip(images[i], h, v);

@@ -13,25 +13,34 @@ import javax.swing.JRadioButtonMenuItem;
 
 public class GameMenu extends GameComponent implements ActionListener {
 	private boolean active = false;
-	protected JMenuBar menuBar = null;
+	private JMenuBar menuBar = null;
 	private HashMap<String, JMenu> menus = new HashMap<String, JMenu>();
 	private HashMap<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
 	private HashMap<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
 
-	public GameMenu(Game g, boolean active) {
+	public GameMenu(final Game g, final boolean init) {
 		super(g);
-		if (active) {
-			this.active = true;
+		if (init) {
+			active = true;
 			game = g;
 			menuBar = new JMenuBar();
-			game.frame.setJMenuBar(menuBar);
+			game.getFrame().setJMenuBar(menuBar);
 			add("Game");
 			addCheckItem("Game", "Pause", "pause");
 			addItem("Game", "Exit", "exit");
 		}
 	}
+	
+	public final int getSize() {
+		if (active) {
+			return menuBar.getHeight();
+		} else {
+			return 0;
+		}
+	}
 
-	public void addRadioItem(String id, String name, String cmd, String group) {
+	public final void addRadioItem(final String id, final String name,
+			final String cmd, final String group) {
 		if (active) {
 			ButtonGroup g = null;
 			if (menuGroups.containsKey(group)) {
@@ -46,15 +55,15 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public void addCheckItem(String id, String name, String cmd) {
+	public final void addCheckItem(final String id, final String name, final String cmd) {
 		addItems(id, new JCheckBoxMenuItem(name), cmd);
 	}
 
-	public void addItem(String id, String name, String cmd) {
+	public final void addItem(final String id, final String name, final String cmd) {
 		addItems(id, new JMenuItem(name), cmd);
 	}
 
-	private void addItems(String id, JMenuItem item, String cmd) {
+	private void addItems(final String id, final JMenuItem item, final String cmd) {
 		if (active) {
 			JMenu menu = get(id);
 			if (menu != null && !menuItems.containsKey(cmd)) {
@@ -66,13 +75,13 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public void enable(String id, boolean enable) {
+	public final void enable(final String id, final boolean enable) {
 		if (active) {
 			get(id).setEnabled(enable);
 		}
 	}
 
-	public void enable(boolean enable) {
+	public final void enable(final boolean enable) {
 		if (active) {
 			for (JMenu menu : menus.values()) {
 				menu.setEnabled(enable);
@@ -80,7 +89,7 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public JMenu add(String name) {
+	public final JMenu add(final String name) {
 		if (active && !menus.containsKey(name)) {
 			JMenu menu = new JMenu(name);
 			menus.put(name, menu);
@@ -93,7 +102,7 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public JMenu get(String name) {
+	public final JMenu get(final String name) {
 		if (active && !menus.containsKey(name)) {
 			return null;
 		} else {
@@ -101,7 +110,7 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public JMenuItem getItem(String name) {
+	public final JMenuItem getItem(final String name) {
 		if (!active || !menuItems.containsKey(name)) {
 			return null;
 		} else {
@@ -109,18 +118,18 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public void select(String name, boolean selected) {
+	public final void select(final String name, final boolean selected) {
 		if (active) {
 			getItem(name).setSelected(selected);
 		}
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	public final void actionPerformed(final ActionEvent e) {
 		String cmd = e.getActionCommand();
 		if (cmd.equals("exit")) {
 			game.exitGame();
 		} else if (cmd.equals("pause")) {
-			game.pause(!game.paused);
+			game.pause(!game.isPaused());
 		} else {
 			game.onMenu(cmd);
 		}

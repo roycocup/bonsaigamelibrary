@@ -51,7 +51,7 @@ public class SoundObjectOgg extends SoundObject {
 	int channels = 0;
 	SourceDataLine outputLine = null;
 
-	void init_jorbis() {
+	private void initJorbis() {
 		oy = new SyncState();
 		os = new StreamState();
 		og = new Page();
@@ -68,23 +68,22 @@ public class SoundObjectOgg extends SoundObject {
 		oy.init();
 	}
 
-	SourceDataLine getOutputLine(int channels, int rate) {
-		if (outputLine == null || this.rate != rate
-				|| this.channels != channels) {
+	private SourceDataLine getOutputLine(final int c, final int r) {
+		if (outputLine == null || rate != r || channels != c) {
 			if (outputLine != null) {
 				outputLine.drain();
 				outputLine.stop();
 				outputLine.close();
 			}
-			init_audio(channels, rate);
+			init_audio(c, r);
 			outputLine.start();
 		}
 		return outputLine;
 	}
 
-	void init_audio(int channels, int rate) {
+	private void init_audio(final int c, final int r) {
 		try {
-			AudioFormat audioFormat = new AudioFormat(rate, 16, channels, true, // PCM_Signed
+			AudioFormat audioFormat = new AudioFormat(r, 16, c, true, // PCM_Signed
 					false // littleEndian
 			);
 			DataLine.Info info = new DataLine.Info(SourceDataLine.class,
@@ -102,8 +101,8 @@ public class SoundObjectOgg extends SoundObject {
 				return;
 			}
 
-			this.rate = rate;
-			this.channels = channels;
+			rate = r;
+			channels = c;
 
 		} catch (Exception ee) {
 			System.out.println(ee);
@@ -111,26 +110,26 @@ public class SoundObjectOgg extends SoundObject {
 	}
 
 	@Override
-	public void initSound(byte[] bytes) {
-		byteData = bytes;
-		bitStream = new ByteArrayInputStream(bytes.clone());
+	public final void initSound(final byte[] dataBytes) {
+		byteData = dataBytes;
+		bitStream = new ByteArrayInputStream(dataBytes.clone());
 		if (!isDaemon()) {
 			setDaemon(true);
 		}
 	}
 
 	@Override
-	public void run() {
-		play();
+	public final void startSound() {
+		playSound();
 		while (loop && status != 2) {
 			initSound(byteData);
-			play();
+			playSound();
 		}
 		status = 0;
 	}
 
-	public void play() {
-		init_jorbis();
+	public final void playSound() {
+		initJorbis();
 		loop: while (true) {
 			int eos = 0;
 
@@ -308,8 +307,9 @@ public class SoundObjectOgg extends SoundObject {
 								}
 							}
 						}
-						if (og.eos() != 0)
+						if (og.eos() != 0) {
 							eos = 1;
+						}
 					}
 				}
 
@@ -325,8 +325,9 @@ public class SoundObjectOgg extends SoundObject {
 						break;
 					}
 					oy.wrote(bytes);
-					if (bytes == 0)
+					if (bytes == 0) {
 						eos = 1;
+					}
 				}
 			}
 
@@ -339,8 +340,9 @@ public class SoundObjectOgg extends SoundObject {
 		oy.clear();
 
 		try {
-			if (bitStream != null)
+			if (bitStream != null) {
 				bitStream.close();
+			}
 		} catch (Exception e) {
 		}
 	}

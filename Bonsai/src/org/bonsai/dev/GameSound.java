@@ -32,11 +32,11 @@ public class GameSound extends GameComponent {
 	private HashMap<String, byte[]> sounds = new HashMap<String, byte[]>();
 	private HashMap<String, SoundObject> soundsStatus = new HashMap<String, SoundObject>();
 
-	public GameSound(Game g) {
+	public GameSound(final Game g) {
 		super(g);
 	}
 
-	public boolean load(String id, String filename) {
+	public final boolean load(final String id, final String filename) {
 		String type = "";
 		if (filename.toLowerCase().endsWith("wav")) {
 			type = "WAV";
@@ -66,7 +66,7 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public boolean isPlaying(String id) {
+	public final boolean isPlaying(final String id) {
 		if (soundsStatus.containsKey(id)) {
 			return soundsStatus.get(id).status == 1;
 		} else {
@@ -74,7 +74,7 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public boolean isPaused(String id) {
+	public final boolean isPaused(final String id) {
 		if (soundsStatus.containsKey(id)) {
 			return soundsStatus.get(id).status == 3;
 		} else {
@@ -82,13 +82,13 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public void stop(String id) {
+	public final void stop(final String id) {
 		if (soundsStatus.containsKey(id)) {
 			soundsStatus.get(id).status = 2;
 		}
 	}
 
-	public void pause(String id, boolean pause) {
+	public final void pause(final String id, final boolean pause) {
 		if (soundsStatus.containsKey(id)) {
 			if (soundsStatus.get(id).status != 2) {
 				soundsStatus.get(id).status = pause ? 3 : 1;
@@ -96,14 +96,14 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public void setVolume(String id, float volume) {
+	public final void setVolume(final String id, final float volume) {
 		if (soundsStatus.containsKey(id)) {
 			soundsStatus.get(id).volume = volume;
 			soundsStatus.get(id).toVolume = volume;
 		}
 	}
 
-	public void setFadeVolume(String id, float volume) {
+	public final void setFadeVolume(final String id, final float volume) {
 		if (soundsStatus.containsKey(id)) {
 			try {
 				soundsStatus.get(id).toVolume = volume;
@@ -115,7 +115,7 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public boolean isSilent(String id) {
+	public final boolean isSilent(final String id) {
 		if (soundsStatus.containsKey(id)) {
 			return soundsStatus.get(id).volume == 0.0f;
 		} else {
@@ -123,17 +123,17 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public void play(String id, boolean stop) {
+	public final void play(final String id, final boolean stop) {
 		play(id, stop, false, 1.0f);
 	}
 
-	public void play(String id, boolean stop, boolean loop, float volume) {
+	public final void play(final String id, final boolean stop, final boolean loop, final float volume) {
 		if (game.hasSound() && sounds.containsKey(id)) {
 			if (isPlaying(id) && stop) {
 				soundsStatus.get(id).status = 2;
 			}
 			soundsStatus.put(id, null);
-			SoundObject snd = soundTypes.get(id) == "WAV" ? new SoundObject()
+			SoundObject snd = soundTypes.get(id) == "WAV" ? new SoundObjectWav()
 					: new SoundObjectOgg();
 			snd.loop = loop;
 			snd.volume = volume;
@@ -144,7 +144,7 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public boolean delete(String id) {
+	public final boolean delete(final String id) {
 		if (soundsStatus.containsKey(id)) {
 			sounds.remove(id);
 			soundTypes.remove(id);
@@ -155,19 +155,19 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public void stopAll() {
+	public final void stopAll() {
 		for (String id : sounds.keySet()) {
 			stop(id);
 		}
 	}
 
-	public void pauseAll(boolean mode) {
+	public final void pauseAll(final boolean mode) {
 		for (String id : sounds.keySet()) {
 			pause(id, mode);
 		}
 	}
 
-	public boolean init() {
+	public final boolean init() {
 		AudioFormat[] formats = new AudioFormat[] {
 				new AudioFormat(44100.0f, 16, 2, true, false),
 				new AudioFormat(22050.0f, 16, 2, true, false),

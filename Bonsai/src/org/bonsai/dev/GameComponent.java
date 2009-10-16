@@ -1,13 +1,13 @@
 package org.bonsai.dev;
 
 public class GameComponent {
-	protected Game game;
+	public Game game;
 
-	public GameComponent(Game g) {
+	public GameComponent(final Game g) {
 		game = g;
 	}
 	
-	public long getTime() {
+	public final long getTime() {
 		return game.getTime();
 	}
 }

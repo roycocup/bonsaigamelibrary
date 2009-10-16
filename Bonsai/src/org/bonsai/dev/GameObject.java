@@ -27,8 +27,8 @@ public class GameObject<G extends Game> {
 	protected GameMenu menu;
 	protected GameSound sound;
 	protected GameTimer timer;
-	
-	public GameObject(G g) {
+
+	public GameObject(final G g) {
 		game = g;
 		animation = game.animation;
 		font = game.font;
@@ -38,8 +38,8 @@ public class GameObject<G extends Game> {
 		sound = game.sound;
 		timer = game.timer;
 	}
-	
-	public long getTime() {
+
+	public final long getTime() {
 		return game.getTime();
 	}
 }

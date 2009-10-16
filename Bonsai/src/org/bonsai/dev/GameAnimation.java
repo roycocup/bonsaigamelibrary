@@ -23,23 +23,30 @@ import java.util.LinkedList;
 
 public class GameAnimation extends GameComponent {
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
-	protected LinkedList<Animation> animationList = new LinkedList<Animation>();
+	private LinkedList<Animation> animationList = new LinkedList<Animation>();
 
-	public GameAnimation(Game g) {
+	public GameAnimation(final Game g) {
 		super(g);
 	}
 
-	public Animation add(String id, int frames[], int frameTime, boolean loop) {
+	public final void update() {
+		for (Animation anim : animationList) {
+			anim.update();
+		}
+	}
+
+	public final Animation add(final String id, final int[] frames,
+			final int frameTime, final boolean loop) {
 		return new Animation(id, frames, frameTime, loop);
 	}
 
-	public void set(String id, int frame) {
+	public final void set(final String id, final int frame) {
 		if (animations.containsKey(id)) {
 			animations.get(id).set(frame);
 		}
 	}
 
-	public int get(String id) {
+	public final int get(final String id) {
 		if (animations.containsKey(id)) {
 			return animations.get(id).get();
 		} else {
@@ -47,7 +54,7 @@ public class GameAnimation extends GameComponent {
 		}
 	}
 
-	public boolean delete(String id) {
+	public final boolean delete(final String id) {
 		if (animations.containsKey(id)) {
 			animationList.remove(animations.remove(id));
 			return true;
@@ -63,7 +70,8 @@ public class GameAnimation extends GameComponent {
 		private long lastTime;
 		private boolean loop;
 
-		public Animation(String id, int[] f, int time, boolean l) {
+		public Animation(final String id, final int[] f, final int time,
+				final boolean l) {
 			frames = f;
 			pos = 0;
 			loop = l;
@@ -73,7 +81,7 @@ public class GameAnimation extends GameComponent {
 			animationList.add(this);
 		}
 
-		public void update() {
+		public final void update() {
 			if (lastTime == -1) {
 				lastTime = getTime();
 
@@ -92,11 +100,11 @@ public class GameAnimation extends GameComponent {
 			}
 		}
 
-		public void set(int frame) {
+		public final void set(final int frame) {
 			pos = frame;
 		}
 
-		public int get() {
+		public final int get() {
 			return frames[pos];
 		}
 	}
