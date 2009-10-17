@@ -30,10 +30,10 @@ public class Base64 {
 	private final static byte EQUALS_SIGN = (byte) '=';
 	private final static byte NEW_LINE = (byte) '\n';
 	private final static String PREFERRED_ENCODING = "US-ASCII";
-	private final static byte WHITE_SPACE_ENC = -5;
+	private static final byte WHITE_SPACE_ENC = -5;
 	private final static byte EQUALS_SIGN_ENC = -1;
 
-	private final static byte[] _STANDARD_ALPHABET = { (byte) 'A', (byte) 'B',
+	private static final byte[] _STANDARD_ALPHABET = { (byte) 'A', (byte) 'B',
 			(byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', (byte) 'G',
 			(byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L',
 			(byte) 'M', (byte) 'N', (byte) 'O', (byte) 'P', (byte) 'Q',
@@ -103,55 +103,15 @@ public class Base64 {
 			return destination;
 		}
 	}
-
-	public static String encodeBytes(byte[] source) {
-		String encoded = null;
-		try {
-			encoded = encodeBytes(source, 0, source.length, NO_OPTIONS);
-		} catch (java.io.IOException ex) {
-			assert false : ex.getMessage();
-		}
-		assert encoded != null;
-		return encoded;
-	}
-
-	public static String encodeBytes(byte[] source, int options)
-			throws java.io.IOException {
-		return encodeBytes(source, 0, source.length, options);
-	}
-
-	public static String encodeBytes(byte[] source, int off, int len) {
-		String encoded = null;
-		try {
-			encoded = encodeBytes(source, off, len, NO_OPTIONS);
-		} catch (java.io.IOException ex) {
-			assert false : ex.getMessage();
-		}
-		assert encoded != null;
-		return encoded;
-	}
-
-	public static String encodeBytes(byte[] source, int off, int len,
-			int options) throws java.io.IOException {
-		byte[] encoded = encodeBytesToBytes(source, off, len, options);
+	
+	public static String encodeBytes(byte[] source) throws java.io.IOException {
+		byte[] encoded = encodeBytesToBytes(source, 0, source.length, NO_OPTIONS);
 
 		try {
 			return new String(encoded, PREFERRED_ENCODING);
 		} catch (java.io.UnsupportedEncodingException uue) {
 			return new String(encoded);
 		}
-	}
-
-	public static byte[] encodeBytesToBytes(byte[] source) {
-		byte[] encoded = null;
-		try {
-			encoded = encodeBytesToBytes(source, 0, source.length,
-					Base64.NO_OPTIONS);
-		} catch (java.io.IOException ex) {
-			assert false : "IOExceptions only come from GZipping, which is turned off: "
-					+ ex.getMessage();
-		}
-		return encoded;
 	}
 
 	public static byte[] encodeBytesToBytes(byte[] source, int off, int len,
@@ -271,16 +231,6 @@ public class Base64 {
 		}
 	}
 
-	public static byte[] decode(byte[] source) {
-		byte[] decoded = null;
-		try {
-			decoded = decode(source, 0, source.length, Base64.NO_OPTIONS);
-		} catch (java.io.IOException ex) {
-			assert false : "IOExceptions only come from GZipping, which is turned off: "
-					+ ex.getMessage();
-		}
-		return decoded;
-	}
 
 	public static byte[] decode(byte[] source, int off, int len, int options)
 			throws java.io.IOException {
@@ -339,11 +289,7 @@ public class Base64 {
 		return out;
 	}
 
-	public static byte[] decode(String s) throws java.io.IOException {
-		return decode(s, NO_OPTIONS);
-	}
-
-	public static byte[] decode(String s, int options)
+	public static byte[] decode(String s)
 			throws java.io.IOException {
 
 		if (s == null) {
@@ -355,47 +301,7 @@ public class Base64 {
 		} catch (java.io.UnsupportedEncodingException uee) {
 			bytes = s.getBytes();
 		}
-		bytes = decode(bytes, 0, bytes.length, options);
-
-		boolean dontGunzip = (options & DONT_GUNZIP) != 0;
-		if ((bytes != null) && (bytes.length >= 4) && (!dontGunzip)) {
-
-			int head = ((int) bytes[0] & 0xff) | ((bytes[1] << 8) & 0xff00);
-			if (java.util.zip.GZIPInputStream.GZIP_MAGIC == head) {
-				java.io.ByteArrayInputStream bais = null;
-				java.util.zip.GZIPInputStream gzis = null;
-				java.io.ByteArrayOutputStream baos = null;
-				byte[] buffer = new byte[2048];
-				int length = 0;
-
-				try {
-					baos = new java.io.ByteArrayOutputStream();
-					bais = new java.io.ByteArrayInputStream(bytes);
-					gzis = new java.util.zip.GZIPInputStream(bais);
-
-					while ((length = gzis.read(buffer)) >= 0) {
-						baos.write(buffer, 0, length);
-					}
-					bytes = baos.toByteArray();
-
-				} catch (java.io.IOException e) {
-					e.printStackTrace();
-				} finally {
-					try {
-						baos.close();
-					} catch (Exception e) {
-					}
-					try {
-						gzis.close();
-					} catch (Exception e) {
-					}
-					try {
-						bais.close();
-					} catch (Exception e) {
-					}
-				}
-			}
-		}
+		bytes = decode(bytes, 0, bytes.length, NO_OPTIONS);
 		return bytes;
 	}
 

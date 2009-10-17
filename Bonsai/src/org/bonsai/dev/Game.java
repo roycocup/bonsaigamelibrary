@@ -68,7 +68,7 @@ public abstract class Game extends Applet {
 	private Graphics2D graphics;
 	private int width;
 	private int height;
-	private int scale = 1;
+	private int scale;
 
 	// Game Stuff
 	private boolean gameLoaded = false;
@@ -78,9 +78,9 @@ public abstract class Game extends Applet {
 	private boolean focused = false;
 	private boolean pausedOnFocus = false;
 
-	private int maxFPS = 0;
+	private int maxFPS;
 	private int currentFPS = 0;
-	private long fpsWait = 0;
+	private long fpsWait;
 	private long gameTime = 0;
 
 	private transient Thread gameLoader = null;
@@ -179,7 +179,7 @@ public abstract class Game extends Applet {
 		frame.setLayout(new BorderLayout(0, 0));
 		frame.setResizable(false);
 		frame.setTitle(title);
-		this.menu = new GameMenu(this, m);
+		menu = new GameMenu(this, m);
 		frame.addWindowListener(new FrameClose());
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setVisible(true);
@@ -365,7 +365,6 @@ public abstract class Game extends Applet {
 				} while (!updateScreen());
 
 				// Limit FPS
-
 				if (!paused) {
 					// Use Nanoseconds instead of currentTimeMillis which
 					// has a much lower resolution(based on the OS interrupt
