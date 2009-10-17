@@ -75,13 +75,13 @@ public class SoundObjectOgg extends SoundObject {
 				outputLine.stop();
 				outputLine.close();
 			}
-			init_audio(c, r);
+			initAudio(c, r);
 			outputLine.start();
 		}
 		return outputLine;
 	}
 
-	private void init_audio(final int c, final int r) {
+	private void initAudio(final int c, final int r) {
 		try {
 			AudioFormat audioFormat = new AudioFormat(r, 16, c, true, // PCM_Signed
 					false // littleEndian
@@ -105,13 +105,22 @@ public class SoundObjectOgg extends SoundObject {
 			channels = c;
 
 		} catch (Exception ee) {
-			System.out.println(ee);
+			ee.printStackTrace();
 		}
 	}
 
 	@Override
 	public final void initSound(final byte[] dataBytes) {
-		byteData = dataBytes;
+		if (byteData == null) {
+			byteData = dataBytes;
+		}
+		if (bitStream != null) {
+			try {
+				bitStream.close();
+				bitStream = null;
+			} catch (IOException e) {
+			}
+		}
 		bitStream = new ByteArrayInputStream(dataBytes.clone());
 		if (!isDaemon()) {
 			setDaemon(true);
@@ -138,7 +147,7 @@ public class SoundObjectOgg extends SoundObject {
 			try {
 				bytes = bitStream.read(buffer, index, BUFSIZE);
 			} catch (Exception e) {
-				System.err.println(e);
+				e.printStackTrace();
 				return;
 			}
 			oy.wrote(bytes);
@@ -175,8 +184,6 @@ public class SoundObjectOgg extends SoundObject {
 							if (result == 0)
 								break;
 							if (result == -1) {
-								System.err
-										.println("Corrupt secondary header.  Exiting.");
 								// return;
 								break loop;
 							}
@@ -191,7 +198,7 @@ public class SoundObjectOgg extends SoundObject {
 				try {
 					bytes = bitStream.read(buffer, index, BUFSIZE);
 				} catch (Exception e) {
-					System.err.println(e);
+					e.printStackTrace();
 					return;
 				}
 				if (bytes == 0 && i < 2) {

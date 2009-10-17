@@ -30,8 +30,18 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class SoundObjectWav extends SoundObject {
+	@Override
 	public final void initSound(final byte[] bytes) {
-		byteData = bytes;
+		if (byteData == null) {
+			byteData = bytes;
+		}
+		if (audioInputStream != null) {
+			try {
+				audioInputStream.close();
+				audioInputStream = null;
+			} catch (IOException e) {
+			}
+		}
 		InputStream stream = new ByteArrayInputStream(bytes.clone());
 		try {
 			audioInputStream = AudioSystem.getAudioInputStream(stream);
@@ -46,6 +56,7 @@ public class SoundObjectWav extends SoundObject {
 		}
 	}
 
+	@Override
 	public final void startSound() {
 		AudioFormat format = audioInputStream.getFormat();
 		DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);

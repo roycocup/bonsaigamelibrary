@@ -98,41 +98,12 @@ public abstract class Game extends Applet {
 	protected GameTimer timer = new GameTimer(this);
 	protected GameMenu menu = null;
 
-	// Getters
-	public final JFrame getFrame() {
-		return frame;
-	}
-
-	public final Applet getApplet() {
-		return applet;
-	}
-
-	public final GraphicsConfiguration getConfig() {
-		return config;
-	}
-
-	public final BufferedImage getBackbuffer() {
-		return background;
-	}
-
-	public final boolean hasMenu() {
-		return menu != null;
-	}
-
-	// Checks
-	public final boolean isApplet() {
-		return applet != null;
-	}
-
+	/*
+	 * Path --------------------------------------------------------------------
+	 */
 	public final boolean isJar() {
 		if (!isApplet()) {
-			try {
-				return this.getClass().getProtectionDomain().getCodeSource()
-						.getLocation().toURI().getPath().toLowerCase()
-						.endsWith(".jar");
-			} catch (URISyntaxException e) {
-				return false;
-			}
+			return currentPath().toLowerCase().endsWith(".jar");
 		} else {
 			return true;
 		}
@@ -140,17 +111,23 @@ public abstract class Game extends Applet {
 
 	public final String getPath() {
 		if (!isApplet()) {
+			String path = currentPath();
+			if (isJar()) {
+				path = path.substring(0, path.lastIndexOf("/") + 1);
+			}
+			return path;
+		} else {
+			return "";
+		}
+	}
+
+	private String currentPath() {
+		if (!isApplet()) {
 			try {
-
-				String path = this.getClass().getProtectionDomain()
-						.getCodeSource().getLocation().toURI().getPath();
-
-				if (path.toLowerCase().endsWith(".jar")) {
-					path = path.substring(0, path.lastIndexOf("/") + 1);
-				}
-				return path;
+				return this.getClass().getProtectionDomain().getCodeSource()
+						.getLocation().toURI().getPath();
 			} catch (URISyntaxException e) {
-				return null;
+				return "";
 			}
 		} else {
 			return "";
@@ -185,8 +162,9 @@ public abstract class Game extends Applet {
 		frame.setVisible(true);
 
 		// Engine
-		initEngine(frame);
 		resize();
+		initEngine(frame);
+		
 		initThreads();
 		canvas.requestFocus();
 	}
@@ -198,8 +176,7 @@ public abstract class Game extends Applet {
 				+ menu.getSize());
 	}
 
-	public void onMenu(final String id) {
-	}
+	public abstract void onMenu(final String id);
 
 	private class FrameClose extends WindowAdapter {
 		@Override
@@ -208,9 +185,16 @@ public abstract class Game extends Applet {
 		}
 	}
 
+	public final JFrame getFrame() {
+		return frame;
+	}
+
+	public final boolean hasMenu() {
+		return menu != null;
+	}
+
 	/*
-	 * Applet
-	 * ---------------------------------------------------------------------
+	 * Applet ------------------------------------------------------------------
 	 */
 	@Override
 	public final void start() {
@@ -235,6 +219,14 @@ public abstract class Game extends Applet {
 	@Override
 	public final void destroy() {
 		exitGame();
+	}
+
+	public final boolean isApplet() {
+		return applet != null;
+	}
+
+	public final Applet getApplet() {
+		return applet;
 	}
 
 	public final int height() {
@@ -320,7 +312,6 @@ public abstract class Game extends Applet {
 	/*
 	 * Gameloop ----------------------------------------------------------------
 	 */
-
 	private class GameLoop extends Thread {
 		@Override
 		public void run() {
@@ -447,6 +438,14 @@ public abstract class Game extends Applet {
 		}
 	}
 
+	public final GraphicsConfiguration getConfig() {
+		return config;
+	}
+
+	public final BufferedImage getBackbuffer() {
+		return background;
+	}
+
 	/*
 	 * Game methods ------------------------------------------------------------
 	 */
@@ -537,13 +536,11 @@ public abstract class Game extends Applet {
 		return true;
 	}
 
-	public void writeSave(final OutputStream stream) throws IOException {
-	}
+	public abstract void writeSave(final OutputStream stream) throws IOException;
 
 	/*
 	 * Loading -----------------------------------------------------------------
 	 */
-
 	public final boolean loadGame(final String filename, final String cookiename) {
 		try {
 			InputStream stream = null;
@@ -598,6 +595,5 @@ public abstract class Game extends Applet {
 		return true;
 	}
 
-	public void readSave(final InputStream stream) throws IOException {
-	}
+	public abstract void readSave(final InputStream stream) throws IOException;
 }

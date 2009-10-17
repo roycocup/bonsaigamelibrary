@@ -1,7 +1,6 @@
 package org.bonsai.dev;
 
 import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.SourceDataLine;
 
 public abstract class SoundObject extends Thread {
@@ -11,10 +10,9 @@ public abstract class SoundObject extends Thread {
 	protected boolean silent = false;
 	public int status = 1;
 	public boolean loop = false;
-	protected byte[] byteData;
+	protected byte[] byteData = null;
 	public SourceDataLine line = null;
-	public AudioInputStream audioInputStream;
-	public FloatControl volumeControl;
+	public AudioInputStream audioInputStream = null;
 
 	public abstract void initSound(final byte[] bytes);
 
