@@ -53,7 +53,7 @@ import org.bonsai.ext.Base64;
 
 import netscape.javascript.JSObject;
 
-public abstract class Game extends Applet {
+public class Game extends Applet {
 	// Applet
 	private static final long serialVersionUID = -7860545086276629929L;
 
@@ -102,45 +102,42 @@ public abstract class Game extends Applet {
 	 * Path --------------------------------------------------------------------
 	 */
 	public final boolean isJar() {
+		boolean isJar = true;
 		if (!isApplet()) {
-			return currentPath().toLowerCase().endsWith(".jar");
-		} else {
-			return true;
+			isJar = currentPath().toLowerCase().endsWith(".jar");
 		}
+		return isJar;
 	}
 
 	public final String getPath() {
+		String path = "";
 		if (!isApplet()) {
-			String path = currentPath();
+			path = currentPath();
 			if (isJar()) {
 				path = path.substring(0, path.lastIndexOf("/") + 1);
 			}
-			return path;
-		} else {
-			return "";
 		}
+		return path;
 	}
 
 	private String currentPath() {
+		String path = "";
 		if (!isApplet()) {
 			try {
-				return this.getClass().getProtectionDomain().getCodeSource()
+				path = this.getClass().getProtectionDomain().getCodeSource()
 						.getLocation().toURI().getPath();
 			} catch (URISyntaxException e) {
-				return "";
+				path = "";
 			}
-		} else {
-			return "";
 		}
+		return path;
 	}
-
-	public abstract String getBasePath();
 
 	/*
 	 * GUI ---------------------------------------------------------------------
 	 */
 	public final void frame(final String title, final int sizex,
-			final int sizey, final boolean scaled, final boolean m) {
+			final int sizey, final boolean scaled, final boolean initMenu) {
 
 		// Size
 		if (scaled) {
@@ -156,7 +153,7 @@ public abstract class Game extends Applet {
 		frame.setLayout(new BorderLayout(0, 0));
 		frame.setResizable(false);
 		frame.setTitle(title);
-		menu = new GameMenu(this, m);
+		menu = new GameMenu(this, initMenu);
 		frame.addWindowListener(new FrameClose());
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setVisible(true);
@@ -164,7 +161,7 @@ public abstract class Game extends Applet {
 		// Engine
 		resize();
 		initEngine(frame);
-		
+
 		initThreads();
 		canvas.requestFocus();
 	}
@@ -176,7 +173,8 @@ public abstract class Game extends Applet {
 				+ menu.getSize());
 	}
 
-	public abstract void onMenu(final String id);
+	public void onMenu(final String menuID) {
+	}
 
 	private class FrameClose extends WindowAdapter {
 		@Override
@@ -191,6 +189,10 @@ public abstract class Game extends Applet {
 
 	public final boolean hasMenu() {
 		return menu != null;
+	}
+
+	public static void main(final String args[]) {
+		new Game().frame("Bonsai Game Library 1.00", 320, 240, false, true);
 	}
 
 	/*
@@ -241,6 +243,17 @@ public abstract class Game extends Applet {
 		return scale;
 	}
 
+	public final void setScale(final int scale) {
+		canvas.setSize(width * scale, height * scale);
+		canvas.createBufferStrategy(2);
+		do {
+			strategy = canvas.getBufferStrategy();
+		} while (strategy == null);
+		this.scale = scale;
+		resize();
+	}
+	
+	
 	/*
 	 * Gameloader --------------------------------------------------------------
 	 */
@@ -301,13 +314,18 @@ public abstract class Game extends Applet {
 		}
 	}
 
-	public abstract void initGame();
+	public void initGame() {
+	}
 
-	public abstract void initLoading();
+	public void initLoading() {
+	}
 
-	public abstract void renderLoading(final Graphics2D g);
+	public void renderLoading(final Graphics2D g) {
+	}
 
-	public abstract void finishLoading();
+	public void finishLoading() {
+		menu.enable(true);
+	}
 
 	/*
 	 * Gameloop ----------------------------------------------------------------
@@ -320,7 +338,7 @@ public abstract class Game extends Applet {
 			int fpsCount = 0;
 			long fpsTime = 0;
 
-			Graphics2D g = (Graphics2D) background.getGraphics();
+			final Graphics2D g = (Graphics2D) background.getGraphics();
 			main: while (true) {
 				// Pausing
 				long renderStart = System.nanoTime();
@@ -449,11 +467,14 @@ public abstract class Game extends Applet {
 	/*
 	 * Game methods ------------------------------------------------------------
 	 */
-	public abstract void renderGame(final Graphics2D g);
+	public void renderGame(final Graphics2D g) {
+	}
 
-	public abstract void updateGame();
+	public void updateGame() {
+	}
 
-	public abstract void finishGame();
+	public void finishGame() {
+	}
 
 	public final void exitGame() {
 		isRunning = false;
@@ -536,7 +557,8 @@ public abstract class Game extends Applet {
 		return true;
 	}
 
-	public abstract void writeSave(final OutputStream stream) throws IOException;
+	public void writeSave(final OutputStream stream) throws IOException {
+	}
 
 	/*
 	 * Loading -----------------------------------------------------------------
@@ -595,5 +617,6 @@ public abstract class Game extends Applet {
 		return true;
 	}
 
-	public abstract void readSave(final InputStream stream) throws IOException;
+	public void readSave(final InputStream stream) throws IOException {
+	}
 }

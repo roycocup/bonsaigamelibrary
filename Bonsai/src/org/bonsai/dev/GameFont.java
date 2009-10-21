@@ -27,8 +27,8 @@ public class GameFont extends GameComponent {
 	private int fontWidth;
 	private int fontHeight;
 
-	public GameFont(final Game g) {
-		super(g);
+	public GameFont(final Game game) {
+		super(game);
 	}
 
 	public final boolean load(final String filename, final int cols,

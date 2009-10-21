@@ -30,8 +30,8 @@ import java.util.LinkedList;
 public class GameInput extends GameComponent implements MouseListener,
 		MouseMotionListener, KeyListener, FocusListener {
 
-	public GameInput(final Game g) {
-		super(g);
+	public GameInput(final Game game) {
+		super(game);
 	}
 
 	// Mouse

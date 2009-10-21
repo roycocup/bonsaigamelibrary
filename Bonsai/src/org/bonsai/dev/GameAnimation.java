@@ -25,8 +25,8 @@ public class GameAnimation extends GameComponent {
 	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
 	private LinkedList<Animation> animationList = new LinkedList<Animation>();
 
-	public GameAnimation(final Game g) {
-		super(g);
+	public GameAnimation(final Game game) {
+		super(game);
 	}
 
 	public final void update() {

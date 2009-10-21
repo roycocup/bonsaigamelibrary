@@ -28,8 +28,8 @@ public class GameObject<G extends Game> {
 	protected GameSound sound;
 	protected GameTimer timer;
 
-	public GameObject(final G g) {
-		game = g;
+	public GameObject(final G game) {
+		this.game = game;
 		animation = game.animation;
 		font = game.font;
 		input = game.input;

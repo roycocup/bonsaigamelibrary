@@ -12,60 +12,61 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 
 public class GameMenu extends GameComponent implements ActionListener {
-	private boolean active = false;
-	private JMenuBar menuBar = null;
-	private HashMap<String, JMenu> menus = new HashMap<String, JMenu>();
-	private HashMap<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
-	private HashMap<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
+	private transient boolean active = false;
+	private transient JMenuBar menuBar = null;
+	private transient final HashMap<String, JMenu> menus = new HashMap<String, JMenu>();
+	private transient final HashMap<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
+	private transient final HashMap<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
 
-	public GameMenu(final Game g, final boolean init) {
-		super(g);
+	public GameMenu(final Game game, final boolean init) {
+		super(game);
 		if (init) {
 			active = true;
-			game = g;
 			menuBar = new JMenuBar();
 			game.getFrame().setJMenuBar(menuBar);
 			add("Game");
 			addCheckItem("Game", "Pause", "pause");
+			addCheckItem("Game", "Double", "scale");
+			select("scale", game.scale() == 2);
+			get("Game").addSeparator();
 			addItem("Game", "Exit", "exit");
 		}
 	}
-	
+
 	public final int getSize() {
-		if (active) {
-			return menuBar.getHeight();
-		} else {
-			return 0;
-		}
+		return active ? menuBar.getHeight() : 0;
 	}
 
-	public final void addRadioItem(final String id, final String name,
+	public final void addRadioItem(final String menuID, final String name,
 			final String cmd, final String group) {
 		if (active) {
-			ButtonGroup g = null;
+			ButtonGroup bGroup = null;
 			if (menuGroups.containsKey(group)) {
-				g = menuGroups.get(group);
+				bGroup = menuGroups.get(group);
 			} else {
-				g = new ButtonGroup();
-				menuGroups.put(group, g);
+				bGroup = new ButtonGroup();
+				menuGroups.put(group, bGroup);
 			}
-			JRadioButtonMenuItem item = new JRadioButtonMenuItem(name);
-			g.add(item);
-			addItems(id, item, cmd);
+			final JRadioButtonMenuItem item = new JRadioButtonMenuItem(name);
+			bGroup.add(item);
+			addItems(menuID, item, cmd);
 		}
 	}
 
-	public final void addCheckItem(final String id, final String name, final String cmd) {
-		addItems(id, new JCheckBoxMenuItem(name), cmd);
+	public final void addCheckItem(final String menuID, final String name,
+			final String cmd) {
+		addItems(menuID, new JCheckBoxMenuItem(name), cmd);
 	}
 
-	public final void addItem(final String id, final String name, final String cmd) {
-		addItems(id, new JMenuItem(name), cmd);
+	public final void addItem(final String menuID, final String name,
+			final String cmd) {
+		addItems(menuID, new JMenuItem(name), cmd);
 	}
 
-	private void addItems(final String id, final JMenuItem item, final String cmd) {
+	private void addItems(final String menuID, final JMenuItem item,
+			final String cmd) {
 		if (active) {
-			JMenu menu = get(id);
+			final JMenu menu = get(menuID);
 			if (menu != null && !menuItems.containsKey(cmd)) {
 				item.setActionCommand(cmd);
 				item.addActionListener(this);
@@ -75,9 +76,9 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public final void enable(final String id, final boolean enable) {
+	public final void enable(final String menuID, final boolean enable) {
 		if (active) {
-			get(id).setEnabled(enable);
+			get(menuID).setEnabled(enable);
 		}
 	}
 
@@ -90,32 +91,29 @@ public class GameMenu extends GameComponent implements ActionListener {
 	}
 
 	public final JMenu add(final String name) {
+		JMenu menu = null;
 		if (active && !menus.containsKey(name)) {
-			JMenu menu = new JMenu(name);
+			menu = new JMenu(name);
 			menus.put(name, menu);
 			menuBar.add(menu);
 			menuBar.validate();
 			menu.setEnabled(false);
-			return menu;
-		} else {
-			return null;
 		}
+		return menu;
 	}
 
 	public final JMenu get(final String name) {
-		if (active && !menus.containsKey(name)) {
-			return null;
-		} else {
+		if (active && menus.containsKey(name)) {
 			return menus.get(name);
 		}
+		return null;
 	}
 
 	public final JMenuItem getItem(final String name) {
-		if (!active || !menuItems.containsKey(name)) {
-			return null;
-		} else {
+		if (active && menuItems.containsKey(name)) {
 			return menuItems.get(name);
 		}
+		return null;
 	}
 
 	public final void select(final String name, final boolean selected) {
@@ -124,12 +122,17 @@ public class GameMenu extends GameComponent implements ActionListener {
 		}
 	}
 
-	public final void actionPerformed(final ActionEvent e) {
-		String cmd = e.getActionCommand();
-		if (cmd.equals("exit")) {
+	public final void actionPerformed(final ActionEvent event) {
+		final String cmd = event.getActionCommand();
+		if ("exit".equals(cmd)) {
 			game.exitGame();
-		} else if (cmd.equals("pause")) {
+
+		} else if ("pause".equals(cmd)) {
 			game.pause(!game.isPaused());
+
+		} else if ("scale".equals(cmd)) {
+			game.setScale(game.scale() == 1 ? 2 : 1);
+
 		} else {
 			game.onMenu(cmd);
 		}

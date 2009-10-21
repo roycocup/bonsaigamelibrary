@@ -28,19 +28,19 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 
 public class GameImage extends GameComponent {
-	public GameImage(final Game g) {
-		super(g);
+	public GameImage(final Game game) {
+		super(game);
 	}
 
 	public final BufferedImage getScreen() {
-		int w = game.width();
-		int h = game.height();
-		int s = game.scale();
-		BufferedImage buffer = create(w * s, h * s);
+		int width = game.width();
+		int height = game.height();
+		int scale = game.scale();
+		BufferedImage buffer = create(width * scale, height * scale);
 		Graphics2D g = (Graphics2D) buffer.getGraphics();
-		if (s != 1) {
-			g.drawImage(game.getBackbuffer(), 0, 0, w * s, h * s, 0, 0, w, h,
-					null);
+		if (scale != 1) {
+			g.drawImage(game.getBackbuffer(), 0, 0, width * scale, height
+					* scale, 0, 0, width, height, null);
 		} else {
 			g.drawImage(game.getBackbuffer(), 0, 0, null);
 		}
@@ -49,7 +49,7 @@ public class GameImage extends GameComponent {
 	}
 
 	private URL getURL(final String filename) {
-		URL url = Game.class.getResource(filename);
+		URL url = this.getClass().getResource(filename);
 		return url;
 	}
 
@@ -101,7 +101,8 @@ public class GameImage extends GameComponent {
 		return buffer;
 	}
 
-	public final BufferedImage flip(final BufferedImage image, final boolean h, final boolean v) {
+	public final BufferedImage flip(final BufferedImage image, final boolean h,
+			final boolean v) {
 		BufferedImage buffer = game.getConfig().createCompatibleImage(
 				image.getWidth(), image.getHeight(),
 				image.getColorModel().getTransparency());
@@ -115,8 +116,8 @@ public class GameImage extends GameComponent {
 		return buffer;
 	}
 
-	public final BufferedImage[] flips(final BufferedImage[] images, final boolean h,
-			final boolean v) {
+	public final BufferedImage[] flips(final BufferedImage[] images,
+			final boolean h, final boolean v) {
 		BufferedImage[] buffer = new BufferedImage[images.length];
 		for (int i = 0; i < images.length; i++) {
 			buffer[i] = flip(images[i], h, v);

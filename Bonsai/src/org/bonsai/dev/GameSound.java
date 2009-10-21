@@ -32,8 +32,8 @@ public class GameSound extends GameComponent {
 	private HashMap<String, byte[]> sounds = new HashMap<String, byte[]>();
 	private HashMap<String, SoundObject> soundsStatus = new HashMap<String, SoundObject>();
 
-	public GameSound(final Game g) {
-		super(g);
+	public GameSound(final Game game) {
+		super(game);
 	}
 
 	public final boolean load(final String id, final String filename) {
@@ -46,7 +46,7 @@ public class GameSound extends GameComponent {
 			return false;
 		}
 		try {
-			InputStream stream = Game.class.getResourceAsStream(filename);
+			InputStream stream = this.getClass().getResourceAsStream(filename);
 			int size = stream.available();
 			byte[] bytes = new byte[size];
 			int offset = 0;
@@ -127,7 +127,8 @@ public class GameSound extends GameComponent {
 		play(id, stop, false, 1.0f);
 	}
 
-	public final void play(final String id, final boolean stop, final boolean loop, final float volume) {
+	public final void play(final String id, final boolean stop,
+			final boolean loop, final float volume) {
 		if (game.hasSound() && sounds.containsKey(id)) {
 			if (isPlaying(id) && stop) {
 				soundsStatus.get(id).status = 2;

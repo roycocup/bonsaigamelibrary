@@ -23,8 +23,8 @@ import java.util.HashMap;
 public class GameTimer extends GameComponent {
 	private HashMap<String, Timer> timers = new HashMap<String, Timer>();
 
-	public GameTimer(final Game g) {
-		super(g);
+	public GameTimer(final Game game) {
+		super(game);
 	}
 
 	public final Timer add(final String id, final long timeout) {

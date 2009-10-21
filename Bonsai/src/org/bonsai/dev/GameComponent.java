@@ -3,8 +3,8 @@ package org.bonsai.dev;
 public class GameComponent {
 	public Game game;
 
-	public GameComponent(final Game g) {
-		game = g;
+	public GameComponent(final Game game) {
+		this.game = game;
 	}
 	
 	public final long getTime() {
