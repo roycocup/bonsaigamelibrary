@@ -20,10 +20,12 @@ package org.bonsai.dev;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class GameAnimation extends GameComponent {
-	private HashMap<String, Animation> animations = new HashMap<String, Animation>();
-	private LinkedList<Animation> animationList = new LinkedList<Animation>();
+	private Map<String, Animation> animations = new HashMap<String, Animation>();
+	private List<Animation> animationList = new LinkedList<Animation>();
 
 	public GameAnimation(final Game game) {
 		super(game);

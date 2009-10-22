@@ -244,16 +244,20 @@ public class Game extends Applet {
 	}
 
 	public final void setScale(final int scale) {
-		canvas.setSize(width * scale, height * scale);
-		canvas.createBufferStrategy(2);
-		do {
-			strategy = canvas.getBufferStrategy();
-		} while (strategy == null);
-		this.scale = scale;
-		resize();
+		try {
+			canvas.setSize(width * scale, height * scale);
+			canvas.createBufferStrategy(2);
+			strategy = null;
+			do {
+				strategy = canvas.getBufferStrategy();
+			} while (strategy == null);
+			this.scale = scale;
+			resize();
+		} catch (IllegalStateException e) {
+
+		}
 	}
-	
-	
+
 	/*
 	 * Gameloader --------------------------------------------------------------
 	 */
@@ -543,7 +547,7 @@ public class Game extends Applet {
 				writeSave(stream);
 				JSObject win = JSObject.getWindow(this);
 				JSObject doc = (JSObject) win.getMember("document");
-				String data = cookiename + "save="
+				String data = cookiename + "="
 						+ Base64.encodeBytes(stream.toByteArray())
 						+ "; path=/; expires=Thu, 31-Dec-2019 12:00:00 GMT";
 
@@ -577,15 +581,13 @@ public class Game extends Applet {
 
 				String myCookie = (String) myDocument.getMember("cookie");
 				if (myCookie.length() > 0) {
-					String get = cookiename + "save=";
-					int offset = myCookie.indexOf(get);
-					if (offset != -1) {
-						offset += get.length();
-						int end = myCookie.indexOf(";", offset);
-						if (end == -1) {
-							end = myCookie.length();
+					String[] cookies = myCookie.split(";");
+					for (String cookie : cookies) {
+						int pos = cookie.indexOf("=");
+						if (cookie.substring(0, pos).trim().equals(cookiename)) {
+							data = cookie.substring(pos + 1);
+							break;
 						}
-						data = myCookie.substring(offset, end);
 					}
 				}
 

@@ -21,6 +21,7 @@ package org.bonsai.dev;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -28,23 +29,33 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
 public class GameSound extends GameComponent {
-	private HashMap<String, String> soundTypes = new HashMap<String, String>();
-	private HashMap<String, byte[]> sounds = new HashMap<String, byte[]>();
-	private HashMap<String, SoundObject> soundsStatus = new HashMap<String, SoundObject>();
+	private Map<String, Class<? extends SoundObject>> soundTypes = new HashMap<String, Class<? extends SoundObject>>();
+	private Map<String, byte[]> sounds = new HashMap<String, byte[]>();
+	private Map<String, SoundObject> soundsStatus = new HashMap<String, SoundObject>();
+	private Map<String, Class<? extends SoundObject>> soundEngines = new HashMap<String, Class<? extends SoundObject>>();
 
 	public GameSound(final Game game) {
 		super(game);
+		addType("wav", SoundObjectWav.class);
+	}
+
+	public void addType(final String ext,
+			final Class<? extends SoundObject> sound) {
+		soundEngines.put(ext, sound);
 	}
 
 	public final boolean load(final String id, final String filename) {
-		String type = "";
-		if (filename.toLowerCase().endsWith("wav")) {
-			type = "WAV";
-		} else if (filename.toLowerCase().endsWith("ogg")) {
-			type = "OGG";
-		} else {
+		Class<? extends SoundObject> type = null;
+		for (String ext : soundEngines.keySet()) {
+			if (filename.toLowerCase().endsWith(ext)) {
+				type = soundEngines.get(ext);
+				break;
+			}
+		}
+		if (type == null) {
 			return false;
 		}
+
 		try {
 			InputStream stream = this.getClass().getResourceAsStream(filename);
 			int size = stream.available();
@@ -108,7 +119,6 @@ public class GameSound extends GameComponent {
 			try {
 				soundsStatus.get(id).toVolume = volume;
 				soundsStatus.get(id).volumeChanged = true;
-				soundsStatus.get(id).silent = false;
 			} catch (Exception e) {
 				setFadeVolume(id, volume);
 			}
@@ -134,14 +144,23 @@ public class GameSound extends GameComponent {
 				soundsStatus.get(id).status = 2;
 			}
 			soundsStatus.put(id, null);
-			SoundObject snd = soundTypes.get(id) == "WAV" ? new SoundObjectWav()
-					: new SoundObjectOgg();
-			snd.loop = loop;
-			snd.volume = volume;
-			snd.toVolume = volume;
-			snd.initSound(sounds.get(id));
-			snd.start();
-			soundsStatus.put(id, snd);
+			SoundObject snd;
+			try {
+				snd = soundTypes.get(id).newInstance();
+				snd.loop = loop;
+				snd.volume = volume;
+				snd.toVolume = volume;
+				snd.initSound(sounds.get(id));
+				snd.start();
+				soundsStatus.put(id, snd);
+
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			// soundTypes.get(id) == "WAV" ? new SoundObjectWav()
+			// : new SoundObjectOgg();
 		}
 	}
 

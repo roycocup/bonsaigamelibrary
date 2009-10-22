@@ -7,7 +7,6 @@ public abstract class SoundObject extends Thread {
 	public float volume = 1.0f;
 	public float toVolume = 0.0f;
 	public boolean volumeChanged = false;
-	protected boolean silent = false;
 	public int status = 1;
 	public boolean loop = false;
 	protected byte[] byteData = null;

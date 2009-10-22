@@ -228,22 +228,7 @@ public class SoundObjectOgg extends SoundObject {
 							break;
 						}
 						while (true) {
-							// Volume
-							if (volumeChanged) {
-								if (volume > toVolume) {
-									volume = volume - 0.02f;
-									if (volume < toVolume) {
-										volume = toVolume;
-										volumeChanged = false;
-									}
-								} else if (volume < toVolume) {
-									volume = volume + 0.02f;
-									if (volume > toVolume) {
-										volumeChanged = false;
-										volume = toVolume;
-									}
-								}
-							}
+
 							// Stopped
 							if (status == 2) {
 								try {
@@ -267,6 +252,22 @@ public class SoundObjectOgg extends SoundObject {
 										status = 2;
 									}
 									outputLine.start();
+								}
+
+								// Volume
+							} else if (volumeChanged) {
+								if (volume > toVolume) {
+									volume = volume - 0.02f;
+									if (volume < toVolume) {
+										volume = toVolume;
+										volumeChanged = false;
+									}
+								} else if (volume < toVolume) {
+									volume = volume + 0.02f;
+									if (volume > toVolume) {
+										volumeChanged = false;
+										volume = toVolume;
+									}
 								}
 							}
 

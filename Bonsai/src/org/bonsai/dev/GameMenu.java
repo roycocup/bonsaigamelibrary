@@ -3,6 +3,7 @@ package org.bonsai.dev;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -14,9 +15,9 @@ import javax.swing.JRadioButtonMenuItem;
 public class GameMenu extends GameComponent implements ActionListener {
 	private transient boolean active = false;
 	private transient JMenuBar menuBar = null;
-	private transient final HashMap<String, JMenu> menus = new HashMap<String, JMenu>();
-	private transient final HashMap<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
-	private transient final HashMap<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
+	private transient final Map<String, JMenu> menus = new HashMap<String, JMenu>();
+	private transient final Map<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
+	private transient final Map<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
 
 	public GameMenu(final Game game, final boolean init) {
 		super(game);

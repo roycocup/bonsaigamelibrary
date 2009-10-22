@@ -26,6 +26,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.LinkedList;
+import java.util.List;
 
 public class GameInput extends GameComponent implements MouseListener,
 		MouseMotionListener, KeyListener, FocusListener {
@@ -35,8 +36,8 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	// Mouse
-	private LinkedList<Integer> mousePressed = new LinkedList<Integer>();
-	private LinkedList<Integer> mouseDown = new LinkedList<Integer>();
+	private List<Integer> mousePressed = new LinkedList<Integer>();
+	private List<Integer> mouseDown = new LinkedList<Integer>();
 	private int mouseX = 0;
 	private int mouseY = 0;
 
@@ -82,9 +83,9 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	// Keyboard
-	private LinkedList<Integer> keysPressed = new LinkedList<Integer>();
-	private LinkedList<Integer> keysDown = new LinkedList<Integer>();
-	private LinkedList<Integer> keysRemove = new LinkedList<Integer>();
+	private List<Integer> keysPressed = new LinkedList<Integer>();
+	private List<Integer> keysDown = new LinkedList<Integer>();
+	private List<Integer> keysRemove = new LinkedList<Integer>();
 
 	public void keyTyped(final KeyEvent e) {
 	}
