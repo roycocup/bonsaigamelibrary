@@ -29,6 +29,7 @@ import com.jcraft.jogg.*;
 import javax.sound.sampled.*;
 
 public class SoundObjectOgg extends SoundObject {
+	public String typeName = "OGG";
 	InputStream bitStream = null;
 
 	static final int BUFSIZE = 512;
@@ -122,9 +123,6 @@ public class SoundObjectOgg extends SoundObject {
 			}
 		}
 		bitStream = new ByteArrayInputStream(dataBytes.clone());
-		if (!isDaemon()) {
-			setDaemon(true);
-		}
 	}
 
 	@Override
@@ -216,6 +214,7 @@ public class SoundObjectOgg extends SoundObject {
 			int[] _index = new int[vi.channels];
 
 			getOutputLine(vi.channels, vi.rate);
+
 			while (eos == 0) {
 				while (eos == 0) {
 					int result = oy.pageout(og);
@@ -227,7 +226,20 @@ public class SoundObjectOgg extends SoundObject {
 							eos = 1;
 							break;
 						}
+
+						// Get Time Tick
+						long lastTick = System.nanoTime();
+						int loopCount = 1;
+						long tick = 20;
 						while (true) {
+							long delta = System.nanoTime() - lastTick;
+							if (delta > 10000000) {
+								tick = delta / loopCount / 1000000;
+								if (tick == 0) {
+									tick = 1;
+								}
+							}
+							loopCount++;
 
 							// Stopped
 							if (status == 2) {
@@ -256,14 +268,15 @@ public class SoundObjectOgg extends SoundObject {
 
 								// Volume
 							} else if (volumeChanged) {
+								float add = toVolumeDifference / (toVolumeTime / tick);
 								if (volume > toVolume) {
-									volume = volume - 0.02f;
+									volume = volume - add;
 									if (volume < toVolume) {
 										volume = toVolume;
 										volumeChanged = false;
 									}
 								} else if (volume < toVolume) {
-									volume = volume + 0.02f;
+									volume = volume + add;
 									if (volume > toVolume) {
 										volumeChanged = false;
 										volume = toVolume;
@@ -349,9 +362,17 @@ public class SoundObjectOgg extends SoundObject {
 
 		try {
 			if (bitStream != null) {
+				outputLine.drain();
+				outputLine.stop();
+				outputLine.close();
 				bitStream.close();
 			}
 		} catch (Exception e) {
 		}
+	}
+	
+	@Override
+	public String getTypeName() {
+		return "OGG";
 	}
 }

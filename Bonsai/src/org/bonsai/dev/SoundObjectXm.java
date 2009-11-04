@@ -31,6 +31,7 @@ import org.xm.lib.FastTracker2;
 import org.xm.lib.IBXM;
 
 public class SoundObjectXm extends SoundObject {
+	public String typeName = "XM";
 	private IBXM ibxm;
 
 	@Override
@@ -79,7 +80,23 @@ public class SoundObjectXm extends SoundObject {
 		int song_duration = ibxm.calculate_song_duration();
 		byte[] output_buffer = new byte[1024 * 4];
 		int play_position = 0;
+
+		// Get Time Tick
+		long lastTick = System.nanoTime();
+		long tick = 20;
+		int loopCount = 1;
 		while (true) {
+			long delta = System.nanoTime() - lastTick;
+			tick = delta / loopCount / 1000000;
+			if (tick == 0) {
+				tick = 1;
+			}
+			loopCount ++;
+			if (loopCount > 256) {
+				loopCount = 1;
+				lastTick = System.nanoTime();
+			}
+			
 			// Pause
 			if (status == 3) {
 				line.stop();
@@ -100,15 +117,16 @@ public class SoundObjectXm extends SoundObject {
 
 				// Volume
 			} else if (volumeChanged) {
+				float add = toVolumeDifference / (toVolumeTime / tick);
 				if (volume > toVolume) {
-					volume = volume - 0.02f;
+					volume = volume - add;
 					if (volume < toVolume) {
 						volume = toVolume;
 						volumeChanged = false;
 					}
-					
+
 				} else if (volume < toVolume) {
-					volume = volume + 0.02f;
+					volume = volume + add;
 					if (volume > toVolume) {
 						volumeChanged = false;
 						volume = toVolume;
@@ -132,5 +150,10 @@ public class SoundObjectXm extends SoundObject {
 		line.drain();
 		line.stop();
 		line.close();
+	}
+
+	@Override
+	public String getTypeName() {
+		return "XM";
 	}
 }

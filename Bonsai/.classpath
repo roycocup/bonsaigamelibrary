@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jre6/lib/plugin.jar"/>
 	<classpathentry kind="src" path="/OggVorbis"/>
+	<classpathentry kind="src" path="/XMLib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

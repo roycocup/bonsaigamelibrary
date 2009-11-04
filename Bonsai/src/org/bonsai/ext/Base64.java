@@ -17,22 +17,55 @@
 
 package org.bonsai.ext;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Base64.
+ */
 public class Base64 {
+	
+	/** The Constant NO_OPTIONS. */
 	public final static int NO_OPTIONS = 0;
+	
+	/** The Constant ENCODE. */
 	public final static int ENCODE = 1;
+	
+	/** The Constant DECODE. */
 	public final static int DECODE = 0;
+	
+	/** The Constant GZIP. */
 	public final static int GZIP = 2;
+	
+	/** The Constant DONT_GUNZIP. */
 	public final static int DONT_GUNZIP = 4;
+	
+	/** The Constant DO_BREAK_LINES. */
 	public final static int DO_BREAK_LINES = 8;
+	
+	/** The Constant URL_SAFE. */
 	public final static int URL_SAFE = 16;
+	
+	/** The Constant ORDERED. */
 	public final static int ORDERED = 32;
+	
+	/** The Constant MAX_LINE_LENGTH. */
 	private final static int MAX_LINE_LENGTH = 76;
+	
+	/** The Constant EQUALS_SIGN. */
 	private final static byte EQUALS_SIGN = (byte) '=';
+	
+	/** The Constant NEW_LINE. */
 	private final static byte NEW_LINE = (byte) '\n';
+	
+	/** The Constant PREFERRED_ENCODING. */
 	private final static String PREFERRED_ENCODING = "US-ASCII";
+	
+	/** The Constant WHITE_SPACE_ENC. */
 	private static final byte WHITE_SPACE_ENC = -5;
+	
+	/** The Constant EQUALS_SIGN_ENC. */
 	private final static byte EQUALS_SIGN_ENC = -1;
 
+	/** The Constant _STANDARD_ALPHABET. */
 	private static final byte[] _STANDARD_ALPHABET = { (byte) 'A', (byte) 'B',
 			(byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F', (byte) 'G',
 			(byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L',
@@ -48,6 +81,7 @@ public class Base64 {
 			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9',
 			(byte) '+', (byte) '/' };
 
+	/** The Constant _STANDARD_DECODABET. */
 	private final static byte[] _STANDARD_DECODABET = { -9, -9, -9, -9, -9, -9,
 			-9, -9, -9, -5, -5, -9, -9, -5, -9, -9, -9, -9, -9, -9, -9, -9, -9,
 			-9, -9, -9, -9, -9, -9, -9, -9, -9, -5, -9, -9, -9, -9, -9, -9, -9,
@@ -57,18 +91,47 @@ public class Base64 {
 			-9, -9, -9, -9, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
 			39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -9, -9, -9, -9 };
 
+	/**
+	 * Gets the alphabet.
+	 * 
+	 * @param options the options
+	 * 
+	 * @return the alphabet
+	 */
 	private final static byte[] getAlphabet(int options) {
 
 		return _STANDARD_ALPHABET;
 	}
 
+	/**
+	 * Gets the decodabet.
+	 * 
+	 * @param options the options
+	 * 
+	 * @return the decodabet
+	 */
 	private final static byte[] getDecodabet(int options) {
 		return _STANDARD_DECODABET;
 	}
 
+	/**
+	 * Instantiates a new base64.
+	 */
 	private Base64() {
 	}
 
+	/**
+	 * Encode3to4.
+	 * 
+	 * @param source the source
+	 * @param srcOffset the src offset
+	 * @param numSigBytes the num sig bytes
+	 * @param destination the destination
+	 * @param destOffset the dest offset
+	 * @param options the options
+	 * 
+	 * @return the byte[]
+	 */
 	private static byte[] encode3to4(byte[] source, int srcOffset,
 			int numSigBytes, byte[] destination, int destOffset, int options) {
 
@@ -104,6 +167,15 @@ public class Base64 {
 		}
 	}
 	
+	/**
+	 * Encode bytes.
+	 * 
+	 * @param source the source
+	 * 
+	 * @return the string
+	 * 
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static String encodeBytes(byte[] source) throws java.io.IOException {
 		byte[] encoded = encodeBytesToBytes(source, 0, source.length, NO_OPTIONS);
 
@@ -114,6 +186,18 @@ public class Base64 {
 		}
 	}
 
+	/**
+	 * Encode bytes to bytes.
+	 * 
+	 * @param source the source
+	 * @param off the off
+	 * @param len the len
+	 * @param options the options
+	 * 
+	 * @return the byte[]
+	 * 
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static byte[] encodeBytesToBytes(byte[] source, int off, int len,
 			int options) throws java.io.IOException {
 
@@ -171,6 +255,17 @@ public class Base64 {
 
 	}
 
+	/**
+	 * Decode4to3.
+	 * 
+	 * @param source the source
+	 * @param srcOffset the src offset
+	 * @param destination the destination
+	 * @param destOffset the dest offset
+	 * @param options the options
+	 * 
+	 * @return the int
+	 */
 	private static int decode4to3(byte[] source, int srcOffset,
 			byte[] destination, int destOffset, int options) {
 
@@ -232,6 +327,18 @@ public class Base64 {
 	}
 
 
+	/**
+	 * Decode.
+	 * 
+	 * @param source the source
+	 * @param off the off
+	 * @param len the len
+	 * @param options the options
+	 * 
+	 * @return the byte[]
+	 * 
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static byte[] decode(byte[] source, int off, int len, int options)
 			throws java.io.IOException {
 
@@ -289,6 +396,15 @@ public class Base64 {
 		return out;
 	}
 
+	/**
+	 * Decode.
+	 * 
+	 * @param s the s
+	 * 
+	 * @return the byte[]
+	 * 
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static byte[] decode(String s)
 			throws java.io.IOException {
 

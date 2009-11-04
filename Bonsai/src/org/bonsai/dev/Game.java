@@ -83,6 +83,7 @@ public class Game extends Applet {
 	private long fpsWait;
 	private long gameTime = 0;
 
+	private boolean stopped = false;
 	private transient Thread gameLoader = null;
 
 	// GUI
@@ -137,7 +138,8 @@ public class Game extends Applet {
 	 * GUI ---------------------------------------------------------------------
 	 */
 	public final void frame(final String title, final int sizex,
-			final int sizey, final boolean scaled, final boolean initMenu) {
+			final int sizey, final boolean scaled, final boolean initMenu,
+			final boolean gameMenu) {
 
 		// Size
 		if (scaled) {
@@ -153,7 +155,7 @@ public class Game extends Applet {
 		frame.setLayout(new BorderLayout(0, 0));
 		frame.setResizable(false);
 		frame.setTitle(title);
-		menu = new GameMenu(this, initMenu);
+		menu = new GameMenu(this, initMenu, gameMenu);
 		frame.addWindowListener(new FrameClose());
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setVisible(true);
@@ -192,30 +194,34 @@ public class Game extends Applet {
 	}
 
 	public static void main(final String args[]) {
-		new Game().frame("Bonsai Game Library 1.00", 320, 240, false, true);
+		new Game().frame("Bonsai Game Library 1.00", 320, 240, false, true, true);
 	}
 
 	/*
 	 * Applet ------------------------------------------------------------------
 	 */
+
 	@Override
-	public final void start() {
-		if (strategy == null) {
+	public final void init() {
+		if (stopped) {
 			isRunning = true;
-			if (getParameter("scaled") != null) {
-				scale = 2;
-			} else {
-				scale = 1;
-			}
+		} else {
+			scale = getParameter("scaled") != null ? 2 : 1;
 			width = getWidth() / scale;
 			height = getHeight() / scale;
 			setLayout(null);
-			this.menu = new GameMenu(this, false);
+			this.menu = new GameMenu(this, false, false);
 			initEngine(this);
 			applet = this;
 			initThreads();
-			canvas.requestFocus();
+			stopped = false;
 		}
+		canvas.requestFocus();
+	}
+
+	@Override
+	public final void stop() {
+		stopped = true;
 	}
 
 	@Override
@@ -254,7 +260,7 @@ public class Game extends Applet {
 			this.scale = scale;
 			resize();
 		} catch (IllegalStateException e) {
-
+			setScale(scale);
 		}
 	}
 
@@ -375,6 +381,7 @@ public class Game extends Applet {
 					} else {
 						bg.drawImage(background, 0, 0, null);
 					}
+					bg.dispose();
 				} while (!updateScreen());
 
 				// Limit FPS

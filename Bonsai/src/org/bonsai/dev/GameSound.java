@@ -114,14 +114,15 @@ public class GameSound extends GameComponent {
 		}
 	}
 
-	public final void setFadeVolume(final String id, final float volume) {
+	public final void setFadeVolume(final String id, final float volume,
+			final int time) {
 		if (soundsStatus.containsKey(id)) {
-			try {
-				soundsStatus.get(id).toVolume = volume;
-				soundsStatus.get(id).volumeChanged = true;
-			} catch (Exception e) {
-				setFadeVolume(id, volume);
-			}
+			soundsStatus.get(id).toVolumeDifference = Math.abs(soundsStatus
+					.get(id).volume
+					- volume);
+			soundsStatus.get(id).toVolume = volume;
+			soundsStatus.get(id).volumeChanged = true;
+			soundsStatus.get(id).toVolumeTime = time;
 		}
 	}
 
@@ -147,6 +148,8 @@ public class GameSound extends GameComponent {
 			SoundObject snd;
 			try {
 				snd = soundTypes.get(id).newInstance();
+				snd.setDaemon(true);
+				snd.setName(snd.getTypeName() + "-SoundThread-" + id);
 				snd.loop = loop;
 				snd.volume = volume;
 				snd.toVolume = volume;
@@ -159,8 +162,6 @@ public class GameSound extends GameComponent {
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
-			// soundTypes.get(id) == "WAV" ? new SoundObjectWav()
-			// : new SoundObjectOgg();
 		}
 	}
 
@@ -210,4 +211,5 @@ public class GameSound extends GameComponent {
 		}
 		return false;
 	}
+
 }

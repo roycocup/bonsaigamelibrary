@@ -30,6 +30,8 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class SoundObjectWav extends SoundObject {
+	public String typeName = "WAV";
+
 	@Override
 	public final void initSound(final byte[] bytes) {
 		if (byteData == null) {
@@ -50,9 +52,6 @@ public class SoundObjectWav extends SoundObject {
 			return;
 		} catch (UnsupportedAudioFileException e) {
 			return;
-		}
-		if (!isDaemon()) {
-			setDaemon(true);
 		}
 	}
 
@@ -115,5 +114,10 @@ public class SoundObjectWav extends SoundObject {
 			line.close();
 		}
 		audioInputStream = null;
+	}
+	
+	@Override
+	public String getTypeName() {
+		return "WAV";
 	}
 }

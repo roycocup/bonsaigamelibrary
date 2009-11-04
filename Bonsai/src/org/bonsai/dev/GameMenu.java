@@ -19,18 +19,20 @@ public class GameMenu extends GameComponent implements ActionListener {
 	private transient final Map<String, JMenuItem> menuItems = new HashMap<String, JMenuItem>();
 	private transient final Map<String, ButtonGroup> menuGroups = new HashMap<String, ButtonGroup>();
 
-	public GameMenu(final Game game, final boolean init) {
+	public GameMenu(final Game game, final boolean init, final boolean gameMenu) {
 		super(game);
 		if (init) {
 			active = true;
 			menuBar = new JMenuBar();
 			game.getFrame().setJMenuBar(menuBar);
-			add("Game");
-			addCheckItem("Game", "Pause", "pause");
-			addCheckItem("Game", "Double", "scale");
-			select("scale", game.scale() == 2);
-			get("Game").addSeparator();
-			addItem("Game", "Exit", "exit");
+			if (gameMenu) {
+				add("Game");
+				addCheckItem("Game", "Pause", "pause");
+				addCheckItem("Game", "Double", "scale");
+				select("scale", game.scale() == 2);
+				get("Game").addSeparator();
+				addItem("Game", "Exit", "exit");
+			}
 		}
 	}
 
@@ -101,6 +103,13 @@ public class GameMenu extends GameComponent implements ActionListener {
 			menu.setEnabled(false);
 		}
 		return menu;
+	}
+
+	public void remove(final String name) {
+		if (active && menus.containsKey(name)) {
+			menuBar.remove(menus.get(name));
+			menus.remove(name);
+		}
 	}
 
 	public final JMenu get(final String name) {
