@@ -83,7 +83,7 @@ public class SoundObjectXm extends SoundObject {
 
 		// Get Time Tick
 		long lastTick = System.nanoTime();
-		long tick = 20;
+		long tick;
 		int loopCount = 1;
 		while (true) {
 			long delta = System.nanoTime() - lastTick;
@@ -91,12 +91,12 @@ public class SoundObjectXm extends SoundObject {
 			if (tick == 0) {
 				tick = 1;
 			}
-			loopCount ++;
+			loopCount++;
 			if (loopCount > 256) {
 				loopCount = 1;
 				lastTick = System.nanoTime();
 			}
-			
+
 			// Pause
 			if (status == 3) {
 				line.stop();
@@ -148,7 +148,6 @@ public class SoundObjectXm extends SoundObject {
 			}
 		}
 		line.drain();
-		line.stop();
 		line.close();
 	}
 

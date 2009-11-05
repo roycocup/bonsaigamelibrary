@@ -78,7 +78,6 @@ public class Game extends Applet {
 	private boolean focused = false;
 	private boolean pausedOnFocus = false;
 
-	private int maxFPS;
 	private int currentFPS = 0;
 	private long fpsWait;
 	private long gameTime = 0;
@@ -161,14 +160,14 @@ public class Game extends Applet {
 		frame.setVisible(true);
 
 		// Engine
-		resize();
+		resizeFrame();
 		initEngine(frame);
 
 		initThreads();
 		canvas.requestFocus();
 	}
 
-	private void resize() {
+	public void resizeFrame() {
 		frame.setSize((width * scale) + frame.getInsets().left
 				+ frame.getInsets().right, (height * scale)
 				+ frame.getInsets().top + frame.getInsets().bottom
@@ -194,7 +193,8 @@ public class Game extends Applet {
 	}
 
 	public static void main(final String args[]) {
-		new Game().frame("Bonsai Game Library 1.00", 320, 240, false, true, true);
+		new Game().frame("Bonsai Game Library 1.00", 320, 240, false, true,
+				true);
 	}
 
 	/*
@@ -258,7 +258,7 @@ public class Game extends Applet {
 				strategy = canvas.getBufferStrategy();
 			} while (strategy == null);
 			this.scale = scale;
-			resize();
+			resizeFrame();
 		} catch (IllegalStateException e) {
 			setScale(scale);
 		}
@@ -306,11 +306,11 @@ public class Game extends Applet {
 		@Override
 		public void run() {
 			// Init Loading
-			initGame();
+			initGame(true);
 			gameSound = sound.init(); // This actually takes time!
+			finishGame(false);
 			gameLoaded = true;
-			finishLoading();
-
+			
 			// Fix some of the graphical lag
 			// This hack lowers the systems interrupt rate so that Thread.sleep
 			// becomes more precise
@@ -324,17 +324,21 @@ public class Game extends Applet {
 		}
 	}
 
-	public void initGame() {
+	public void initGame(final boolean loaded) {
 	}
 
-	public void initLoading() {
+	public void updateGame(final boolean loaded) {
+
 	}
 
-	public void renderLoading(final Graphics2D g) {
+	public void renderGame(final boolean loaded, final Graphics2D g) {
+
 	}
 
-	public void finishLoading() {
-		menu.enable(true);
+	public void finishGame(final boolean loaded) {
+		if (!loaded) {
+			menu.enable(true);
+		}
 	}
 
 	/*
@@ -344,7 +348,7 @@ public class Game extends Applet {
 		@Override
 		public void run() {
 			setName("Bonsai-GameLoop");
-			initLoading();
+			initGame(false);
 			int fpsCount = 0;
 			long fpsTime = 0;
 
@@ -357,8 +361,8 @@ public class Game extends Applet {
 				}
 
 				// Update Game
-				if (!paused && gameLoaded) {
-					updateGame();
+				if (!paused) {
+					updateGame(gameLoaded);
 					animation.update();
 				}
 				input.clearKeys();
@@ -370,11 +374,7 @@ public class Game extends Applet {
 					if (!isRunning) {
 						break main;
 					}
-					if (!gameLoaded) {
-						renderLoading(g);
-					} else {
-						renderGame(g);
-					}
+					renderGame(gameLoaded, g);
 					if (scale != 1) {
 						bg.drawImage(background, 0, 0, width * scale, height
 								* scale, 0, 0, width, height, null);
@@ -430,7 +430,7 @@ public class Game extends Applet {
 
 			// Clean up
 			gameLoader.interrupt();
-			finishGame();
+			finishGame(true);
 			sound.stopAll();
 			if (!isApplet()) {
 				frame.dispose();
@@ -478,15 +478,6 @@ public class Game extends Applet {
 	/*
 	 * Game methods ------------------------------------------------------------
 	 */
-	public void renderGame(final Graphics2D g) {
-	}
-
-	public void updateGame() {
-	}
-
-	public void finishGame() {
-	}
-
 	public final void exitGame() {
 		isRunning = false;
 	}
@@ -505,8 +496,7 @@ public class Game extends Applet {
 	}
 
 	public final void setFPS(final int fps) {
-		maxFPS = fps;
-		fpsWait = (long) (1.0 / maxFPS * 1000);
+		fpsWait = (long) (1.0 / fps * 1000);
 	}
 
 	public final int getFPS() {

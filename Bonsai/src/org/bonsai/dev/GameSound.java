@@ -61,7 +61,7 @@ public class GameSound extends GameComponent {
 			int size = stream.available();
 			byte[] bytes = new byte[size];
 			int offset = 0;
-			int numRead = 0;
+			int numRead;
 			while (offset < bytes.length
 					&& (numRead = stream.read(bytes, offset, bytes.length
 							- offset)) >= 0) {

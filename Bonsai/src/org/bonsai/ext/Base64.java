@@ -98,7 +98,7 @@ public class Base64 {
 	 * 
 	 * @return the alphabet
 	 */
-	private final static byte[] getAlphabet(int options) {
+	private  static byte[] getAlphabet(int options) {
 
 		return _STANDARD_ALPHABET;
 	}
@@ -110,7 +110,7 @@ public class Base64 {
 	 * 
 	 * @return the decodabet
 	 */
-	private final static byte[] getDecodabet(int options) {
+	private  static byte[] getDecodabet(int options) {
 		return _STANDARD_DECODABET;
 	}
 

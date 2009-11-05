@@ -49,8 +49,7 @@ public class GameImage extends GameComponent {
 	}
 
 	private URL getURL(final String filename) {
-		URL url = this.getClass().getResource(filename);
-		return url;
+		return this.getClass().getResource(filename);
 	}
 
 	public final BufferedImage create(final int width, final int height) {
@@ -59,9 +58,8 @@ public class GameImage extends GameComponent {
 
 	public final BufferedImage create(final int width, final int height,
 			final boolean alpha) {
-		BufferedImage buffer = game.getConfig().createCompatibleImage(width,
-				height, alpha ? Transparency.TRANSLUCENT : Transparency.OPAQUE);
-		return buffer;
+		return game.getConfig().createCompatibleImage(width, height,
+				alpha ? Transparency.TRANSLUCENT : Transparency.OPAQUE);
 	}
 
 	public final BufferedImage get(final String file) {

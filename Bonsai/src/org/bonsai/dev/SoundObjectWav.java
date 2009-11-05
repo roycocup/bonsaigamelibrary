@@ -42,6 +42,7 @@ public class SoundObjectWav extends SoundObject {
 				audioInputStream.close();
 				audioInputStream = null;
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		InputStream stream = new ByteArrayInputStream(bytes.clone());
@@ -49,9 +50,9 @@ public class SoundObjectWav extends SoundObject {
 			audioInputStream = AudioSystem.getAudioInputStream(stream);
 			stream.close();
 		} catch (IOException e) {
-			return;
+			e.printStackTrace();
 		} catch (UnsupportedAudioFileException e) {
-			return;
+			e.printStackTrace();
 		}
 	}
 
@@ -110,12 +111,11 @@ public class SoundObjectWav extends SoundObject {
 			return;
 		} finally {
 			line.drain();
-			line.stop();
 			line.close();
 		}
 		audioInputStream = null;
 	}
-	
+
 	@Override
 	public String getTypeName() {
 		return "WAV";

@@ -32,8 +32,8 @@ public class GameAnimation extends GameComponent {
 	}
 
 	public final void update() {
-		for (Animation anim : animationList) {
-			anim.update();
+		for (Animation animation : animationList) {
+			animation.update();
 		}
 	}
 

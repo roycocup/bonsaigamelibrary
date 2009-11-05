@@ -43,7 +43,7 @@ public class GameMenu extends GameComponent implements ActionListener {
 	public final void addRadioItem(final String menuID, final String name,
 			final String cmd, final String group) {
 		if (active) {
-			ButtonGroup bGroup = null;
+			ButtonGroup bGroup;
 			if (menuGroups.containsKey(group)) {
 				bGroup = menuGroups.get(group);
 			} else {

@@ -111,8 +111,7 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	public final void clearKeys() {
-		for (int i = 0; i < keysRemove.size(); i++) {
-			int key = keysRemove.get(i);
+		for (Integer key : keysRemove) {
 			keysDown.remove(Integer.valueOf(key));
 			if (keysPressed.contains(key)) {
 				keysPressed.remove(Integer.valueOf(key));

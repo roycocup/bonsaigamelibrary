@@ -120,6 +120,7 @@ public class SoundObjectOgg extends SoundObject {
 				bitStream.close();
 				bitStream = null;
 			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		bitStream = new ByteArrayInputStream(dataBytes.clone());
@@ -249,7 +250,8 @@ public class SoundObjectOgg extends SoundObject {
 									outputLine.stop();
 									outputLine.close();
 									outputLine = null;
-								} catch (Exception ee) {
+								} catch (Exception e) {
+									e.printStackTrace();
 								}
 								return;
 
@@ -268,7 +270,8 @@ public class SoundObjectOgg extends SoundObject {
 
 								// Volume
 							} else if (volumeChanged) {
-								float add = toVolumeDifference / (toVolumeTime / tick);
+								float add = toVolumeDifference
+										/ (toVolumeTime / tick);
 								if (volume > toVolume) {
 									volume = volume - add;
 									if (volume < toVolume) {
@@ -363,14 +366,13 @@ public class SoundObjectOgg extends SoundObject {
 		try {
 			if (bitStream != null) {
 				outputLine.drain();
-				outputLine.stop();
-				outputLine.close();
 				bitStream.close();
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public String getTypeName() {
 		return "OGG";
