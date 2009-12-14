@@ -19,6 +19,7 @@
 package org.bonsai.dev;
 
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
@@ -68,10 +69,26 @@ public class GameImage extends GameComponent {
 			return null;
 		} else {
 			try {
-				return ImageIO.read(filename);
+				return compatible(ImageIO.read(filename));
 			} catch (IOException e) {
 				return null;
 			}
+		}
+	}
+
+	private final BufferedImage compatible(BufferedImage image) {
+		GraphicsConfiguration config = game.getConfig();
+		if (image.getColorModel().equals(config.getColorModel())) {
+			return image;
+
+		} else {
+			BufferedImage newImage = config.createCompatibleImage(image
+					.getWidth(), image.getHeight(), image.getColorModel()
+					.getTransparency());
+			Graphics2D g = (Graphics2D) newImage.getGraphics();
+			g.drawImage(image, 0, 0, null);
+			g.dispose();
+			return newImage;
 		}
 	}
 

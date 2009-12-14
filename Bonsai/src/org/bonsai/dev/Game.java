@@ -77,6 +77,7 @@ public class Game extends Applet {
 	private boolean paused = false;
 	private boolean focused = false;
 	private boolean pausedOnFocus = false;
+	private boolean animationPaused = false;
 
 	private int currentFPS = 0;
 	private long fpsWait;
@@ -309,6 +310,7 @@ public class Game extends Applet {
 			initGame(true);
 			gameSound = sound.init(); // This actually takes time!
 			finishGame(false);
+			menu.enable(true);
 			gameLoaded = true;
 			
 			// Fix some of the graphical lag
@@ -336,9 +338,6 @@ public class Game extends Applet {
 	}
 
 	public void finishGame(final boolean loaded) {
-		if (!loaded) {
-			menu.enable(true);
-		}
 	}
 
 	/*
@@ -363,7 +362,9 @@ public class Game extends Applet {
 				// Update Game
 				if (!paused) {
 					updateGame(gameLoaded);
-					animation.update();
+					if (!animationPaused) {
+						animation.update();
+					}
 				}
 				input.clearKeys();
 				input.clearMouse();
@@ -511,6 +512,14 @@ public class Game extends Applet {
 
 	public final boolean isPaused() {
 		return paused;
+	}
+	
+	public final void animationTime(final boolean mode) {
+		animationPaused = mode;
+	}
+	
+	public final boolean isAnimationPaused() {
+		return animationPaused;
 	}
 
 	public final void pauseOnFocus(final boolean mode) {

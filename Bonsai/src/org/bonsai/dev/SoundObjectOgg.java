@@ -65,8 +65,6 @@ public class SoundObjectOgg extends SoundObject {
 
 		buffer = null;
 		bytes = 0;
-
-		oy.init();
 	}
 
 	private SourceDataLine getOutputLine(final int c, final int r) {
@@ -360,9 +358,7 @@ public class SoundObjectOgg extends SoundObject {
 			vd.clear();
 			vi.clear();
 		}
-
-		oy.clear();
-
+		
 		try {
 			if (bitStream != null) {
 				outputLine.drain();
