@@ -66,6 +66,7 @@ public class Game extends Applet {
 	private BufferStrategy strategy;
 	private BufferedImage background;
 	private Graphics2D graphics;
+	private Graphics2D backgroundGraphics;
 	private int width;
 	private int height;
 	private int scale;
@@ -168,6 +169,13 @@ public class Game extends Applet {
 		canvas.requestFocus();
 	}
 
+	public void setSize(final int width, final int height) {
+		this.width = width;
+		this.height = height;
+		background = image.create(width, height, false);
+		backgroundGraphics = (Graphics2D) background.getGraphics();
+		setScale(1);
+	}
 	public void resizeFrame() {
 		frame.setSize((width * scale) + frame.getInsets().left
 				+ frame.getInsets().right, (height * scale)
@@ -351,7 +359,7 @@ public class Game extends Applet {
 			int fpsCount = 0;
 			long fpsTime = 0;
 
-			final Graphics2D g = (Graphics2D) background.getGraphics();
+			backgroundGraphics = (Graphics2D) background.getGraphics();
 			main: while (true) {
 				// Pausing
 				long renderStart = System.nanoTime();
@@ -375,7 +383,7 @@ public class Game extends Applet {
 					if (!isRunning) {
 						break main;
 					}
-					renderGame(gameLoaded, g);
+					renderGame(gameLoaded, backgroundGraphics);
 					if (scale != 1) {
 						bg.drawImage(background, 0, 0, width * scale, height
 								* scale, 0, 0, width, height, null);
@@ -620,6 +628,7 @@ public class Game extends Applet {
 			stream.close();
 
 		} catch (Exception e) {
+		//	e.printStackTrace();
 			return false;
 		}
 		return true;

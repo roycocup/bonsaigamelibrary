@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 
+
 import javax.imageio.ImageIO;
 
 public class GameImage extends GameComponent {
@@ -85,6 +86,7 @@ public class GameImage extends GameComponent {
 			BufferedImage newImage = config.createCompatibleImage(image
 					.getWidth(), image.getHeight(), image.getColorModel()
 					.getTransparency());
+			
 			Graphics2D g = (Graphics2D) newImage.getGraphics();
 			g.drawImage(image, 0, 0, null);
 			g.dispose();
