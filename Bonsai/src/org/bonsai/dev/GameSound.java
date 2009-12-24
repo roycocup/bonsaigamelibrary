@@ -18,7 +18,6 @@
 
 package org.bonsai.dev;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,7 +71,7 @@ public class GameSound extends GameComponent {
 			stream.close();
 			return true;
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}

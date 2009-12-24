@@ -35,6 +35,7 @@ public class SoundObjectOgg extends SoundObject {
 	static final int BUFSIZE = 512;
 	int convsize = BUFSIZE * 2;
 	byte[] convbuffer = new byte[convsize];
+	byte[] emptyBuffer = new byte[convsize];
 
 	SyncState oy;
 	StreamState os;
@@ -83,10 +84,12 @@ public class SoundObjectOgg extends SoundObject {
 	private void initAudio(final int c, final int r) {
 		try {
 			AudioFormat audioFormat = new AudioFormat(r, 16, c, true, // PCM_Signed
-					false // littleEndian
-			);
-			DataLine.Info info = new DataLine.Info(SourceDataLine.class,
-					audioFormat, AudioSystem.NOT_SPECIFIED);
+				false // littleEndian
+					);
+			DataLine.Info info =
+					new DataLine.Info(SourceDataLine.class,
+						audioFormat,
+						AudioSystem.NOT_SPECIFIED);
 			if (!AudioSystem.isLineSupported(info)) {
 				return;
 			}
@@ -268,8 +271,9 @@ public class SoundObjectOgg extends SoundObject {
 
 								// Volume
 							} else if (volumeChanged) {
-								float add = toVolumeDifference
-										/ (toVolumeTime / tick);
+								float add =
+										toVolumeDifference
+												/ (toVolumeTime / tick);
 								if (volume > toVolume) {
 									volume = volume - add;
 									if (volume < toVolume) {
@@ -295,35 +299,44 @@ public class SoundObjectOgg extends SoundObject {
 									vd.synthesis_blockin(vb);
 								}
 
-								while ((samples = vd.synthesis_pcmout(_pcmf,
-										_index)) > 0) {
+								while ((samples =
+										vd.synthesis_pcmout(_pcmf, _index)) > 0) {
 
 									float[][] pcmf = _pcmf[0];
-									int bout = (samples < convsize ? samples
-											: convsize);
+									int bout =
+											(samples < convsize ? samples
+													: convsize);
 
-									for (i = 0; i < vi.channels; i++) {
-										int ptr = i * 2;
-										int mono = _index[i];
-										for (int j = 0; j < bout; j++) {
-											int val = (int) (pcmf[i][mono + j] * (32767. * volume));
-											if (val > 32767) {
-												val = 32767;
-											}
-											if (val < -32768) {
-												val = -32768;
-											}
-											if (val < 0)
-												val = val | 0x8000;
+									if (volume != 0) {
+										for (i = 0; i < vi.channels; i++) {
+											int ptr = i * 2;
+											int mono = _index[i];
+											for (int j = 0; j < bout; j++) {
+												int val =
+														(int) (pcmf[i][mono + j] * (32767. * volume));
+												if (val > 32767) {
+													val = 32767;
+												}
+												if (val < -32768) {
+													val = -32768;
+												}
+												if (val < 0)
+													val = val | 0x8000;
 
-											convbuffer[ptr] = (byte) (val);
-											convbuffer[ptr + 1] = (byte) (val >>> 8);
-											ptr += 2 * (vi.channels);
+												convbuffer[ptr] = (byte) (val);
+												convbuffer[ptr + 1] =
+														(byte) (val >>> 8);
+
+												ptr += 2 * (vi.channels);
+											}
 										}
-									}
+										outputLine.write(convbuffer, 0, 2
+												* vi.channels * bout);
 
-									outputLine.write(convbuffer, 0, 2
-											* vi.channels * bout);
+									} else {
+										outputLine.write(emptyBuffer, 0, 2
+												* vi.channels * bout);
+									}
 
 									vd.synthesis_read(bout);
 								}
@@ -358,7 +371,7 @@ public class SoundObjectOgg extends SoundObject {
 			vd.clear();
 			vi.clear();
 		}
-		
+
 		try {
 			if (bitStream != null) {
 				outputLine.drain();

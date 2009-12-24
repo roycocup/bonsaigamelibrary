@@ -58,9 +58,10 @@ public class Game extends Applet {
 	private static final long serialVersionUID = -7860545086276629929L;
 
 	// Graphics
-	private GraphicsConfiguration config = GraphicsEnvironment
-			.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-			.getDefaultConfiguration();
+	private GraphicsConfiguration config =
+			GraphicsEnvironment.getLocalGraphicsEnvironment()
+				.getDefaultScreenDevice()
+				.getDefaultConfiguration();
 
 	private Canvas canvas;
 	private BufferStrategy strategy;
@@ -92,12 +93,12 @@ public class Game extends Applet {
 	private Applet applet = null;
 
 	// Classes
-	protected GameAnimation animation = new GameAnimation(this);
-	protected GameSound sound = new GameSound(this);
-	protected GameImage image = new GameImage(this);
-	protected GameInput input = new GameInput(this);
-	protected GameFont font = new GameFont(this);
-	protected GameTimer timer = new GameTimer(this);
+	protected GameAnimation animation = null;
+	protected GameSound sound = null;
+	protected GameImage image = null;
+	protected GameInput input = null;
+	protected GameFont font = null;
+	protected GameTimer timer = null;
 	protected GameMenu menu = null;
 
 	/*
@@ -126,8 +127,13 @@ public class Game extends Applet {
 		String path = "";
 		if (!isApplet()) {
 			try {
-				path = this.getClass().getProtectionDomain().getCodeSource()
-						.getLocation().toURI().getPath();
+				path =
+						this.getClass()
+							.getProtectionDomain()
+							.getCodeSource()
+							.getLocation()
+							.toURI()
+							.getPath();
 			} catch (URISyntaxException e) {
 				path = "";
 			}
@@ -176,6 +182,7 @@ public class Game extends Applet {
 		backgroundGraphics = (Graphics2D) background.getGraphics();
 		setScale(1);
 	}
+
 	public void resizeFrame() {
 		frame.setSize((width * scale) + frame.getInsets().left
 				+ frame.getInsets().right, (height * scale)
@@ -279,6 +286,14 @@ public class Game extends Applet {
 	private void initEngine(final Container parent) {
 		setFPS(30);
 
+		// Components
+		animation = new GameAnimation(this);
+		sound = new GameSound(this);
+		image = new GameImage(this);
+		input = new GameInput(this);
+		font = new GameFont(this);
+		timer = new GameTimer(this);
+
 		// Canvas
 		canvas = new Canvas(config);
 		canvas.setSize(width * scale, height * scale);
@@ -320,7 +335,7 @@ public class Game extends Applet {
 			finishGame(false);
 			menu.enable(true);
 			gameLoaded = true;
-			
+
 			// Fix some of the graphical lag
 			// This hack lowers the systems interrupt rate so that Thread.sleep
 			// becomes more precise
@@ -360,6 +375,7 @@ public class Game extends Applet {
 			long fpsTime = 0;
 
 			backgroundGraphics = (Graphics2D) background.getGraphics();
+
 			main: while (true) {
 				// Pausing
 				long renderStart = System.nanoTime();
@@ -377,7 +393,6 @@ public class Game extends Applet {
 				input.clearKeys();
 				input.clearMouse();
 
-				// Render
 				do {
 					Graphics2D bg = getBuffer();
 					if (!isRunning) {
@@ -407,7 +422,8 @@ public class Game extends Applet {
 
 					// More on this:
 					// <http://blogs.sun.com/dholmes/entry/inside_the_hotspot_vm_clocks>
-					long renderTime = (System.nanoTime() - renderStart) / 1000000;
+					long renderTime =
+							(System.nanoTime() - renderStart) / 1000000;
 					try {
 						Thread.sleep(Math.max(0, fpsWait - renderTime));
 					} catch (InterruptedException e) {
@@ -418,7 +434,7 @@ public class Game extends Applet {
 					if (gameLoaded) {
 						gameTime += renderTime;
 					}
-					fpsTime += renderTime;
+					fpsTime += (System.nanoTime() - renderStart) / 1000000;
 					fpsCount += 1;
 					if (fpsTime > 1000 - fpsWait) {
 						currentFPS = fpsCount;
@@ -521,11 +537,11 @@ public class Game extends Applet {
 	public final boolean isPaused() {
 		return paused;
 	}
-	
+
 	public final void animationTime(final boolean mode) {
 		animationPaused = mode;
 	}
-	
+
 	public final boolean isAnimationPaused() {
 		return animationPaused;
 	}
@@ -561,9 +577,11 @@ public class Game extends Applet {
 				writeSave(stream);
 				JSObject win = JSObject.getWindow(this);
 				JSObject doc = (JSObject) win.getMember("document");
-				String data = cookiename + "="
-						+ Base64.encodeBytes(stream.toByteArray())
-						+ "; path=/; expires=Thu, 31-Dec-2019 12:00:00 GMT";
+				String data =
+						cookiename
+								+ "="
+								+ Base64.encodeBytes(stream.toByteArray())
+								+ "; path=/; expires=Thu, 31-Dec-2019 12:00:00 GMT";
 
 				doc.setMember("cookie", data);
 				stream.close();
@@ -590,8 +608,8 @@ public class Game extends Applet {
 			} else {
 				String data = null;
 				JSObject myBrowser = JSObject.getWindow(this);
-				JSObject myDocument = (JSObject) myBrowser
-						.getMember("document");
+				JSObject myDocument =
+						(JSObject) myBrowser.getMember("document");
 
 				String myCookie = (String) myDocument.getMember("cookie");
 				if (myCookie.length() > 0) {
@@ -628,7 +646,7 @@ public class Game extends Applet {
 			stream.close();
 
 		} catch (Exception e) {
-		//	e.printStackTrace();
+			// e.printStackTrace();
 			return false;
 		}
 		return true;
