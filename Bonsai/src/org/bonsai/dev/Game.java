@@ -26,6 +26,7 @@ package org.bonsai.dev;
 import java.applet.Applet;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -76,7 +77,7 @@ public class Game extends Applet {
 	private boolean gameLoaded = false;
 	private boolean gameSound = false;
 	private boolean isRunning = true;
-	private boolean paused = false;
+	protected boolean paused = false;
 	private boolean focused = false;
 	private boolean pausedOnFocus = false;
 	private boolean animationPaused = false;
@@ -100,6 +101,10 @@ public class Game extends Applet {
 	protected GameFont font = null;
 	protected GameTimer timer = null;
 	protected GameMenu menu = null;
+	
+	// Console
+	protected GameConsole console = null;
+	protected boolean consoleOpen = false;
 
 	/*
 	 * Path --------------------------------------------------------------------
@@ -146,7 +151,7 @@ public class Game extends Applet {
 	 */
 	public final void frame(final String title, final int sizex,
 			final int sizey, final boolean scaled, final boolean initMenu,
-			final boolean gameMenu) {
+			final boolean gameMenu, final boolean gameConsole) {
 
 		// Size
 		if (scaled) {
@@ -167,9 +172,13 @@ public class Game extends Applet {
 		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		frame.setVisible(true);
 
+		
 		// Engine
 		resizeFrame();
 		initEngine(frame);
+		if (gameConsole) {
+			console = new GameConsole(this, width(), height() / 4);
+		}
 
 		initThreads();
 		canvas.requestFocus();
@@ -192,6 +201,10 @@ public class Game extends Applet {
 
 	public void onMenu(final String menuID) {
 	}
+	
+	public void onConsole(final String consoleInput) {
+		
+	}
 
 	private class FrameClose extends WindowAdapter {
 		@Override
@@ -210,7 +223,7 @@ public class Game extends Applet {
 
 	public static void main(final String args[]) {
 		new Game().frame("Bonsai Game Library 1.00", 320, 240, false, true,
-				true);
+				true, true);
 	}
 
 	/*
@@ -353,11 +366,12 @@ public class Game extends Applet {
 	}
 
 	public void updateGame(final boolean loaded) {
-
+		
 	}
 
 	public void renderGame(final boolean loaded, final Graphics2D g) {
-
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width(), height());
 	}
 
 	public void finishGame(final boolean loaded) {
@@ -379,8 +393,16 @@ public class Game extends Applet {
 			main: while (true) {
 				// Pausing
 				long renderStart = System.nanoTime();
-				if (input.keyPressed(java.awt.event.KeyEvent.VK_P)) {
+				if (!consoleOpen && input.keyPressed(java.awt.event.KeyEvent.VK_P, true)) {
 					pause(!paused);
+				}
+				
+				// Console
+				if (input.keyDown(java.awt.event.KeyEvent.VK_SHIFT, true) && input.keyPressed(java.awt.event.KeyEvent.VK_F1, true) && console != null) {
+					consoleOpen = !consoleOpen;
+				}
+				if (consoleOpen) {
+					console.control();
 				}
 
 				// Update Game
@@ -393,12 +415,16 @@ public class Game extends Applet {
 				input.clearKeys();
 				input.clearMouse();
 
+				// Render
 				do {
 					Graphics2D bg = getBuffer();
 					if (!isRunning) {
 						break main;
 					}
 					renderGame(gameLoaded, backgroundGraphics);
+					if (consoleOpen) {
+						console.draw(backgroundGraphics, 0, 0);
+					}
 					if (scale != 1) {
 						bg.drawImage(background, 0, 0, width * scale, height
 								* scale, 0, 0, width, height, null);

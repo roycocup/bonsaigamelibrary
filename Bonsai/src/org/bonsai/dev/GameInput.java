@@ -18,7 +18,6 @@
 
 package org.bonsai.dev;
 
-
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -37,8 +36,8 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	// Mouse
-	private List<Integer> mousePressed = new LinkedList<Integer>();
-	private List<Integer> mouseDown = new LinkedList<Integer>();
+	private final List<Integer> mousePressed = new LinkedList<Integer>();
+	private final List<Integer> mouseDown = new LinkedList<Integer>();
 	private int mouseX = 0;
 	private int mouseY = 0;
 
@@ -84,11 +83,14 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	// Keyboard
-	private List<Integer> keysPressed = new LinkedList<Integer>();
-	private List<Integer> keysDown = new LinkedList<Integer>();
-	private List<Integer> keysRemove = new LinkedList<Integer>();
+	private final List<Integer> keysPressed = new LinkedList<Integer>();
+	private final List<Integer> keysDown = new LinkedList<Integer>();
+	private final List<Integer> keysRemove = new LinkedList<Integer>();
 
 	public void keyTyped(final KeyEvent e) {
+		if (game.console != null) {
+			game.console.onKey(e.getKeyChar());
+		}
 	}
 
 	public final void keyPressed(final KeyEvent e) {
@@ -159,10 +161,18 @@ public class GameInput extends GameComponent implements MouseListener,
 	}
 
 	public final boolean keyDown(final int key) {
-		return keysDown.contains(key);
+		return keyDown(key, false);
+	}
+
+	public final boolean keyDown(final int key, final boolean console) {
+		return (!game.consoleOpen || console) && keysDown.contains(key);
 	}
 
 	public final boolean keyPressed(final int key) {
-		return keysPressed.contains(key);
+		return keyPressed(key, false);
+	}
+
+	public final boolean keyPressed(final int key, final boolean console) {
+		return (!game.consoleOpen || console) && keysPressed.contains(key);
 	}
 }

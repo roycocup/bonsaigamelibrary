@@ -93,13 +93,18 @@ public class GameImage extends GameComponent {
 			return newImage;
 		}
 	}
-
+	
 	public final BufferedImage[] gets(final String filename, final int cols,
 			final int rows) {
 		BufferedImage image = get(filename);
 		if (image == null) {
 			return null;
 		}
+		return gets(image, cols, rows);
+	}
+
+	public final BufferedImage[] gets(final BufferedImage image, final int cols,
+			final int rows) {
 		BufferedImage[] buffer = new BufferedImage[cols * rows];
 		int width = image.getWidth() / cols;
 		int height = image.getHeight() / rows;
