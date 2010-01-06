@@ -398,7 +398,7 @@ public class Game extends Applet {
 				}
 				
 				// Console
-				if (input.keyDown(java.awt.event.KeyEvent.VK_SHIFT, true) && input.keyPressed(java.awt.event.KeyEvent.VK_F1, true) && console != null) {
+				if (console != null && consoleKey()) {
 					consoleOpen = !consoleOpen;
 				}
 				if (consoleOpen) {
@@ -587,7 +587,15 @@ public class Game extends Applet {
 	public final void setFocused(final boolean focus) {
 		focused = focus;
 	}
+	
+	public final boolean isConsoleOpen() {
+		return consoleOpen;
+	}
 
+	public boolean consoleKey() {
+		return input.keyDown(java.awt.event.KeyEvent.VK_SHIFT, true) && input.keyPressed(java.awt.event.KeyEvent.VK_F1, true);
+	}
+	
 	/*
 	 * Saving ------------------------------------------------------------------
 	 */

@@ -28,6 +28,14 @@ import com.jcraft.jogg.*;
 
 import javax.sound.sampled.*;
 
+
+/**
+ * 
+ * In order to use OGG Vorbis sound files you need to add the JOrbis Project 
+ * onto your project build path.
+ *
+ */
+
 public class SoundObjectOgg extends SoundObject {
 	public String typeName = "OGG";
 	InputStream bitStream = null;

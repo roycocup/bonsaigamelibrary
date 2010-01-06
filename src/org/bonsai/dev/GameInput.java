@@ -86,9 +86,10 @@ public class GameInput extends GameComponent implements MouseListener,
 	private final List<Integer> keysPressed = new LinkedList<Integer>();
 	private final List<Integer> keysDown = new LinkedList<Integer>();
 	private final List<Integer> keysRemove = new LinkedList<Integer>();
+	private final List<Integer> lastKeys = new LinkedList<Integer>();
 
 	public void keyTyped(final KeyEvent e) {
-		if (game.console != null) {
+		if (game.console != null && game.consoleOpen) {
 			game.console.onKey(e.getKeyChar());
 		}
 	}
@@ -98,6 +99,10 @@ public class GameInput extends GameComponent implements MouseListener,
 		if (!keysDown.contains(key)) {
 			keysDown.add(key);
 			keysPressed.add(key);
+			lastKeys.add(key);
+			if (lastKeys.size() > 16) {
+				lastKeys.remove(0);
+			}
 		}
 		e.consume();
 	}
@@ -174,5 +179,36 @@ public class GameInput extends GameComponent implements MouseListener,
 
 	public final boolean keyPressed(final int key, final boolean console) {
 		return (!game.consoleOpen || console) && keysPressed.contains(key);
+	}
+
+	public final boolean keySequence(final List<Integer> keys) {
+		return keySequence(keys, false);
+	}
+
+	public final boolean keySequence(final List<Integer> keys,
+			final boolean console) {
+		if ((!game.consoleOpen || console) && keysPressed.size() > 0) {
+			int start = -1;
+			for (int i = 0; i < lastKeys.size(); i++) {
+				if (lastKeys.get(i) == keys.get(0)) {
+					start = i;
+					break;
+				}
+			}
+			if (start != -1) {
+				for (int i = 0; i < keys.size(); i++) {
+					if (i + start >= lastKeys.size()) {
+						return false;
+					}
+
+					if (lastKeys.get(i + start) != keys.get(i)) {
+						System.out.println(i);
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 }
